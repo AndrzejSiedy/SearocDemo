@@ -57,7 +57,7 @@ Gnx.OpenLayers = function () {
               new ol.layer.Tile({
                   source: new ol.source.MapQuest({ layer: 'sat' })
               }),
-              wmsLayer,
+              //wmsLayer,
               wmsLayer1
             ],
             view: view
@@ -118,6 +118,12 @@ Gnx.OpenLayers = function () {
         console.warn(result);
     }
 
+    var _parseWfsCapabilities = function (rawData) {
+        var parser = new ol.format.WFSCapabilities();
+        var result = parser.read(rawData);
+        console.warn(result);
+    }
+
     // simple method conatinating user, pass and url
     var _getWmsCapabilities = function (evt, data) {
         
@@ -154,7 +160,49 @@ Gnx.OpenLayers = function () {
 
         }
 
-        
+        //'http://demo:searoc@gis-demo.seaplanner.com:8080/ows?&service=wms&request=GetCapabilities'
+
+        // make capabilities request
+        $.ajax(options)
+
+    }
+
+    // simple method conatinating user, pass and url
+    var _getWfsCapabilities = function (evt, data) {
+
+        var url = data.url;
+
+        if (url.indexOf('service') == -1) {
+            url = url + '&service=wfs';
+        }
+        if (url.indexOf('request') == -1) {
+            url = url + '&request=GetCapabilities';
+        }
+
+        var proxy = '/Proxy/xDomainProxy.ashx?url=';
+        url = proxy + url;
+
+        var options = {
+            type: "GET",
+            url: url,
+            success: function (data) {
+                _parseWfsCapabilities(data);
+                console.warn('wfs capabilities', data);
+            },
+            error: function (data) {
+                console.warn('error', data);
+            }
+        }
+
+        // inject user and and pass to the capabilities request
+        if (data.userName.length > 0 && data.password.length > 0) {
+
+            options.data = {
+                username: data.userName,
+                password: data.password
+            };
+
+        }
 
         //'http://demo:searoc@gis-demo.seaplanner.com:8080/ows?&service=wms&request=GetCapabilities'
 
@@ -183,7 +231,9 @@ Gnx.OpenLayers = function () {
 
         // bind callbact to user clicked "get WMS Capabilities
         Gnx.Event.on('get-wms-capabilities', _getWmsCapabilities);
-        
+        // bind callbact to user clicked "get WFS Capabilities
+        Gnx.Event.on('get-wfs-capabilities', _getWfsCapabilities);
+
 
         return this.initialized;
     }
