@@ -112,58 +112,55 @@ Gnx.OpenLayers = function () {
         self.map.updateSize();
     }
 
+    var _parseWmsCapabilities = function(rawData){
+        var parser = new ol.format.WMSCapabilities();
+        var result = parser.read(rawData);
+        console.warn(result);
+    }
+
     // simple method conatinating user, pass and url
     var _getWmsCapabilities = function (evt, data) {
         
-
         var url = data.url;
 
-        // inject user and and pass to the capabilities request
-        if (data.userName.length > 0 && data.password.length > 0) {
-            
-            if (url.indexOf('http://') > -1 || url.indexOf('https://') > -1) {
-                var u = url.split('://');
-                url = u[0] + '://' + data.userName + ':' + data.password + '@' + u[1];
-            }
-            else {
-                url = 'http://' + data.userName + ':' + data.password + '@' + url;
-            }
-
-            if (url.indexOf('service') == -1) {
-                url = url + '&service=wms';
-            }
-            if (url.indexOf('request') == -1) {
-                url = url + '&request=GetCapabilities';
-            }
+        if (url.indexOf('service') == -1) {
+            url = url + '&service=wms';
         }
-
-        var parser = new ol.format.WMSCapabilities();
+        if (url.indexOf('request') == -1) {
+            url = url + '&request=GetCapabilities';
+        }
 
         var proxy = '/Proxy/xDomainProxy.ashx?url=';
         url = proxy + url;
 
-        //'http://demo:searoc@gis-demo.seaplanner.com:8080/ows?&service=wms&request=GetCapabilities'
-
-        $.ajax({
+        var options = {
             type: "GET",
             url: url,
-            crossDomain: true,
-            //contentType: 'application/json; charset=utf-8',
             success: function (data) {
-                console.warn('dupa', data);
+                _parseWmsCapabilities(data);
             },
             error: function (data) {
                 console.warn('error', data);
             }
-        })
+        }
 
+        // inject user and and pass to the capabilities request
+        if (data.userName.length > 0 && data.password.length > 0) {
 
-        //$.ajax(url).done(function (response) {
-        //    var result = parser.read(response);
-        //    //$('#log').html(window.JSON.stringify(result, null, 2));
+            options.data = {
+                username: data.userName,
+                password: data.password
+            };
 
-        //    console.warn('capabilities response', JSON.stringify(result, null, 2));
-        //});
+        }
+
+        
+
+        //'http://demo:searoc@gis-demo.seaplanner.com:8080/ows?&service=wms&request=GetCapabilities'
+
+        // make capabilities request
+        $.ajax(options)
+
     }
 
    
@@ -176,9 +173,6 @@ Gnx.OpenLayers = function () {
         _init();
 
         this.initialized = _initialized = true;
-
-        //updateSize()
-
 
         // capture west pane resize
         Gnx.Event.on('layout-west-resize-start', onWestResizeStart);
