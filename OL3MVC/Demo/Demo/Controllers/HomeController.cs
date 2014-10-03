@@ -13,9 +13,9 @@ namespace Demo.Controllers
             return View();
         }
 
-        public ActionResult About()
+        public ActionResult Demo()
         {
-            ViewBag.Message = "Your application description page.";
+            ViewBag.Message = "Your OL3 application page.";
 
             return View();
         }
