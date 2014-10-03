@@ -9,6 +9,39 @@ Gnx.West = function () {
     var _init = function () {
         
     }
+
+    // colect form data
+    this.getWmsCapabilitiesCredentials = function () {
+
+        if ($('#inpWmsUrl').val().length == 0) {
+
+            $("#dialog-info").html("WMS Url - field required");
+
+            // Define the Dialog and its properties.
+            $("#dialog-info").dialog({
+                resizable: false,
+                modal: true,
+                title: "Missing field value",
+                height: 250,
+                width: 400,
+                buttons: {
+                    "OK": function () {
+                        $(this).dialog('close');
+                    }
+                }
+            });
+
+            return;
+        }
+
+        // fire event to inform interested modules that user provided Wms capabilities credentials
+        Gnx.Event.fireEvent('get-wms-capabilities', {
+            userName:  $('#inpUserName').val(),
+            password: $('#inpPass').val(),
+            url: $('#inpWmsUrl').val()
+        })
+
+    }
     
     this.init = function () {
 

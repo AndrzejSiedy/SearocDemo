@@ -16,23 +16,31 @@
                 <div style="position: absolute; top: 0px; left: 0px; height: 100%; width:100%; overflow:auto; padding: 5px;">
                     @*actuall container that should be used to place anything inside center pane(panel)*@
                     <div>
-                        <div class="row">
+                        <div class="row" style="margin-left:20px; width:100%;">
                             <div class="col-lg-6">
-                                <div class="input-group">
-                                    <div class="input-group-btn">
-                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action <span class="caret"></span></button>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <li><a href="#">Action</a></li>
-                                            <li><a href="#">Another action</a></li>
-                                            <li><a href="#">Something else here</a></li>
-                                            <li class="divider"></li>
-                                            <li><a href="#">Separated link</a></li>
-                                        </ul>
-                                    </div><!-- /btn-group -->
-                                    <input type="text" class="form-control">
-                                </div><!-- /input-group -->
-                            </div><!-- /.col-lg-6 -->
-                        </div><!-- /.row -->
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label>User name</label>
+                                        <input id="inpUserName" type="text" class="form-control" placeholder="Username" value="demo" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Password</label>
+                                        <input id="inpPass" type="password" class="form-control" placeholder="Password" value="searoc"/>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>WMS Url</label>
+                                        <input id="inpWmsUrl" type="text" class="form-control" placeholder="WMS Url" value="http://gis-demo.seaplanner.com:8080/ows?" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input type="submit" id="btnGetWmsCapabilities" class="btn btn-warning" value="Get Capabilities" onclick="Gnx.West.getWmsCapabilitiesCredentials()" />
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div id="west-inner">
 

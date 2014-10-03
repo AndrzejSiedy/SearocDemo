@@ -58,19 +58,58 @@ Gnx.OpenLayers = function () {
         self.map.updateSize();
     }
 
+    // simple method conatinating user, pass and url
+    var _getWmsCapabilities = function (evt, data) {
+        
 
+        var url = data.url;
 
-    this.getWmsCapabilities = function(url, userName, userPassword){
+        // inject user and and pass to the capabilities request
+        if (data.userName.length > 0 && data.password.length > 0) {
+            
+            if (url.indexOf('http://') > -1 || url.indexOf('https://') > -1) {
+                var u = url.split('://');
+                url = u[0] + '://' + data.userName + ':' + data.password + '@' + u[1];
+            }
+            else {
+                url = 'http://' + data.userName + ':' + data.password + '@' + url;
+            }
+
+            if (url.indexOf('service') == -1) {
+                url = url + '&service=wms';
+            }
+            if (url.indexOf('request') == -1) {
+                url = url + '&request=GetCapabilities';
+            }
+        }
+
         var parser = new ol.format.WMSCapabilities();
 
-        $.ajax(url).then(function (response) {
-            var result = parser.read(response);
-            //$('#log').html(window.JSON.stringify(result, null, 2));
+        console.warn('xxxx', url)
 
-            console.warn('capabilities response', JSON.stringify(result, null, 2));
-        });
+        $.ajax({
+            type: "GET",
+            url: 'http://demo:searoc@gis-demo.seaplanner.com:8080/ows?&service=wms&request=GetCapabilities',
+            contentType: 'application/json; charset=utf-8',
+            //crossDomain: true,
+            success: function (data) {
+                console.warn('dupa', data);
+            },
+            error: function (data) {
+                console.warn('error', data);
+            }
+        })
+
+
+        //$.ajax(url).done(function (response) {
+        //    var result = parser.read(response);
+        //    //$('#log').html(window.JSON.stringify(result, null, 2));
+
+        //    console.warn('capabilities response', JSON.stringify(result, null, 2));
+        //});
     }
 
+   
 
 
     this.init = function () {
@@ -90,8 +129,9 @@ Gnx.OpenLayers = function () {
 
         Gnx.Event.on('layout-west-open-end', onWestOpenEnd);
         Gnx.Event.on('layout-west-close-end', onWestCloseEnd);
-        
 
+        // bind callbact to user clicked "get WMS Capabilities
+        Gnx.Event.on('get-wms-capabilities', _getWmsCapabilities);
         
 
         return this.initialized;
