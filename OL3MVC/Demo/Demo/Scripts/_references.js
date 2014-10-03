@@ -8,3 +8,5 @@
 /// <reference path="respond.matchmedia.addlistener.min.js" />
 /// <reference path="sammy-0.7.5.min.js" />
 /// <reference path="app/routes.js" />
+/// <reference path="jquery-ui-1.11.1.custom/jquery-ui.js" />
+/// <reference path="jquery-ui-1.11.1.custom/external/jquery/jquery.js" />
