@@ -9,7 +9,11 @@ namespace Demo
         public static void RegisterBundles(BundleCollection bundles)
         {
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
-                        "~/Scripts/jquery-{version}.js"));
+                        "~/Scripts/jquery-{version}.js",
+                        "~/Scripts/sammy-{version}.js",
+                        // configure sammy to show/hide views in SPA maner
+                        // it is a place where we initiate GNX app after DOM gets rendered first time
+                        "~/Scripts/app/routes.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
