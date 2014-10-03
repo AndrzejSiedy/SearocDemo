@@ -47,6 +47,8 @@ namespace Demo
                     "~/Scripts/app/Utils/Event.js",
                     "~/Scripts/app/Views/Layout.js",
                     "~/Scripts/app/Views/Center.js",
+                    "~/Scripts/app/Views/West.js",
+                    "~/Scripts/app/Modules/OpenLayers.js",
                     "~/Scripts/app/AppLogic.js"));
 
             // Set EnableOptimizations to false for debugging. For more information,

@@ -139,6 +139,7 @@
     <Content Include="Scripts\app\Setup\Init.js" />
     <Content Include="Scripts\app\Utils\Event.js" />
     <Content Include="Scripts\app\Utils\Utils.js" />
+    <Content Include="Scripts\app\Views\West.js" />
     <Content Include="Scripts\app\Views\Center.js" />
     <Content Include="Scripts\app\Views\Layout.js" />
     <Content Include="Scripts\bootstrap.js" />

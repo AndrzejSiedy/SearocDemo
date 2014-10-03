@@ -1,4 +1,4 @@
-﻿<section id="demo-view" class="subpage-body view">
+﻿<section id="demo-view" class="subpage-body view pane">
 
     <div id="wrapper">
         <!-- the content -->
@@ -8,13 +8,36 @@
                 <div style="position: absolute; top: 0px; left: 0px; height: 100%; width:100%; overflow:auto; padding: 5px;">
                     @*actuall container that should be used to place anything inside center pane(panel)*@
                     <div id="center-inner" style="width:100%; height:100%;">
-                        Center
-                        <p><a href="http://layout.jquery-dev.com/demos.html"><b>Go to the Demos page</b></a></p>
                     </div>
                 </div>
             </div>
             <div id="west-pane-div" class="ui-layout-west">
-                west
+                @*need this wrapping div to show propperly load mask if needed in feature*@
+                <div style="position: absolute; top: 0px; left: 0px; height: 100%; width:100%; overflow:auto; padding: 5px;">
+                    @*actuall container that should be used to place anything inside center pane(panel)*@
+                    <div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="input-group">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action <span class="caret"></span></button>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li><a href="#">Action</a></li>
+                                            <li><a href="#">Another action</a></li>
+                                            <li><a href="#">Something else here</a></li>
+                                            <li class="divider"></li>
+                                            <li><a href="#">Separated link</a></li>
+                                        </ul>
+                                    </div><!-- /btn-group -->
+                                    <input type="text" class="form-control">
+                                </div><!-- /input-group -->
+                            </div><!-- /.col-lg-6 -->
+                        </div><!-- /.row -->
+                    </div>
+                    <div id="west-inner">
+
+                    </div>
+                </div>
             </div>
         </div>
     </div>

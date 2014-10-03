@@ -22,11 +22,24 @@
         var l = me.Layout = new me.Layout();
         
         l.init();
-
         
-        // init shindig container - will be placed in center panel
+        // init and setup center container
         var sc = me.Center = new me.Center();
         sc.init();
+
+        // init west container
+        var sw = me.West = new me.West();
+        sw.init();
+
+        // init and load ol3
+        var ol3 = me.ol3 = new me.OpenLayers();
+        ol3.init();
+
+        // generate map div id
+        var mapDivId = $.getUuid();
+
+        // init map container and map
+        ol3.setupMap(mapDivId);
 
         _appStarted = true;
 

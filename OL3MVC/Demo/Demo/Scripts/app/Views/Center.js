@@ -1,6 +1,6 @@
 ﻿/**
- *  Init Center container UI
- * Will hold Shinding iframed container   
+ * Init Center container UI
+ * Will hold OpenLayers3 map
 */
 Gnx.Center = function () {
 

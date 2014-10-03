@@ -9,15 +9,22 @@ Gnx.Layout = function () {
 
     this.viewport = null;
 
-    _initLayout = function () {
+    var westResizeCallback = function () {
+        Gnx.Event.fireEvent('layout-west-resize-start');
+    }
 
-        var westResizeCallback = function () {
-            Gnx.Event.fireEvent('layout-west-resize-start');
-        }
+    var westResizeEndCallback = function () {
+        Gnx.Event.fireEvent('layout-west-resize-end');
+    }
 
-        var westResizeEndCallback = function () {
-            Gnx.Event.fireEvent('layout-west-resize-end');
-        }
+    var westOpenEnd = function () {
+        Gnx.Event.fireEvent('layout-west-open-end');
+    }
+    var westCloseEnd = function () {
+        Gnx.Event.fireEvent('layout-west-close-end');
+    }
+
+    var _initLayout = function () {
 
         self.viewport = $('#sub-content-center').layout({
             resizeWhileDragging: true
@@ -41,6 +48,8 @@ Gnx.Layout = function () {
                 //, onresize: westResizeCallback
                 , onresize_start: westResizeCallback
                 , onresize_end: westResizeEndCallback
+                , onopen_end: westOpenEnd
+                , onclose_end: westCloseEnd
             }
         });
 

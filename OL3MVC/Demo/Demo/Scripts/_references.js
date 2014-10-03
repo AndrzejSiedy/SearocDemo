@@ -17,3 +17,4 @@
 /// <reference path="app/utils/event.js" />
 /// <reference path="app/utils/utils.js" />
 /// <reference path="app/modules/openlayers.js" />
+/// <reference path="app/views/west.js" />
