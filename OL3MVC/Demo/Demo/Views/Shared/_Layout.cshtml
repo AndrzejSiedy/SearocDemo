@@ -8,6 +8,12 @@
 
     @Scripts.Render("~/bundles/jquery")
 
+
+    @*jQuery Layout plugin inspired by ExiJs border layout*@
+    <link type="text/css" rel="stylesheet" href="//layout.jquery-dev.com/lib/css/layout-default-latest.css" />
+    <script type="text/javascript" src="//layout.jquery-dev.com/lib/js/jquery-ui-latest.js"></script>
+    <script type="text/javascript" src="//layout.jquery-dev.com/lib/js/jquery.layout-latest.js"></script>
+
  
 
     @Styles.Render("~/Content/css")
@@ -26,9 +32,9 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Tasks", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Demo", "Demo", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                    <li><a class="element" href="#/welcome"><span class="icon-grid">&nbsp;</span>Searoc Tasks <sup>v 1.0</sup></a></li>
+                    <li><a class="element" href="#/demo"><span class="icon-comments">&nbsp;</span>Demo</a></li>
+                    <li><a class="element" href="#/contact"><span class="icon-comments">&nbsp;</span>Contact</a></li>
                 </ul>
             </div>
         </div>

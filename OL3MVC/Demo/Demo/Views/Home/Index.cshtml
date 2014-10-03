@@ -1,26 +1,7 @@
-﻿@{
-    ViewBag.Title = "Home Page";
-}
-
-<div class="jumbotron">
-    <h1>Tasks</h1>
-    <p  class="lead">Create simple MVC app</p>
-    <p class="lead">Create OpenLayers3 application</p>
-    <ul>
-        <li>Access GeoServer’s public URL at: on http://gis-demo.seaplanner.com:8080/web/ </li>
-        <li>Read services WMS/WFS capabilities </li>
-        <li>Use raster (WMS)/vector (WFS) layers</li>
-        <li>Use layer switcher</li>
-        <li>Create an SLD file to style the rendered vector data. - This could be only done if provided security credentials have rights to create style and style layers </li>
-        <li>Show popup on GetFeatureInfo </li>
-    </ul>
+﻿<div id="main">
+    <section class="main">
+        @{Html.RenderPartial("~/Views/Home/Welcome.cshtml");}
+        @{Html.RenderPartial("~/Views/Home/Demo.cshtml");}
+        @{Html.RenderPartial("~/Views/Home/Contact.cshtml");}
+    </section>
 </div>
-
-
-
-<p>Date: <input type="text" id="datepicker"></p>
-
-<div id="dialog" title="Basic dialog" style="display: none;">
-    <p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>
-</div>
-
