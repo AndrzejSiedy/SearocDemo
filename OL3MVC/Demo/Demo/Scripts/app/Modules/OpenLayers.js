@@ -8,6 +8,7 @@ Gnx.OpenLayers = function () {
     var _initialized = false;
     this.initialized = false;
 
+
     var _init = function () {
         // get center panel - clear it up, and create ol3 map container
         $('#center-inner').empty();
@@ -23,18 +24,71 @@ Gnx.OpenLayers = function () {
 
         $('#center-inner').html('<div id=' + mapDivId + ' style="width:100%; height:100%;"></div>');
 
+
+        //var searoc:Bathy
+        var wmsSource = new ol.source.ImageWMS({
+            url: 'http://demo.opengeo.org/geoserver/wms',
+            params: { 'LAYERS': 'ne:ne' },
+            serverType: 'geoserver'
+        });
+
+        var wmsLayer = new ol.layer.Image({
+            source: wmsSource
+        });
+
+        var wmsSource1 = new ol.source.ImageWMS({
+            url: 'http://gis-demo.seaplanner.com:8080/wms',
+            params: { 'LAYERS': 'searoc:Bathy' },
+            serverType: 'geoserver'
+        });
+
+        var wmsLayer1 = new ol.layer.Image({
+            source: wmsSource1
+        });
+
+        var view = new ol.View({
+            center: ol.proj.transform([37.41, 8.82], 'EPSG:4326', 'EPSG:3857'),
+            zoom: 4
+        });
+
         self.map = new ol.Map({
             target: mapDivId,
             layers: [
               new ol.layer.Tile({
                   source: new ol.source.MapQuest({ layer: 'sat' })
-              })
+              }),
+              wmsLayer,
+              wmsLayer1
             ],
-            view: new ol.View({
-                center: ol.proj.transform([37.41, 8.82], 'EPSG:4326', 'EPSG:3857'),
-                zoom: 4
-            })
+            view: view
         });
+
+
+
+
+        self.map.on('singleclick', function (evt) {
+            var viewResolution = /** @type {number} */ (view.getResolution());
+            var url = wmsSource1.getGetFeatureInfoUrl(
+                evt.coordinate, viewResolution, 'EPSG:3857',
+                { 'INFO_FORMAT': 'text/html' });
+            if (url) {
+
+                $("#dialog-info").html('<iframe seamless src="' + url + '"></iframe>').dialog({
+                    resizable: false,
+                    modal: true,
+                    title: "Missing field value",
+                    height: 250,
+                    width: 400,
+                    buttons: {
+                        "OK": function () {
+                            $(this).dialog('close');
+                        }
+                    }
+                });
+            }
+        });
+
+
     }
 
     // callbacks to resize map when parent container size change
@@ -85,13 +139,16 @@ Gnx.OpenLayers = function () {
 
         var parser = new ol.format.WMSCapabilities();
 
-        console.warn('xxxx', url)
+        var proxy = '/Proxy/xDomainProxy.ashx?url=';
+        url = proxy + url;
+
+        //'http://demo:searoc@gis-demo.seaplanner.com:8080/ows?&service=wms&request=GetCapabilities'
 
         $.ajax({
             type: "GET",
-            url: 'http://demo:searoc@gis-demo.seaplanner.com:8080/ows?&service=wms&request=GetCapabilities',
-            contentType: 'application/json; charset=utf-8',
-            //crossDomain: true,
+            url: url,
+            crossDomain: true,
+            //contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 console.warn('dupa', data);
             },
