@@ -134,6 +134,7 @@
     <Content Include="Content\bootstrap.css.map" />
     <None Include="Scripts\jquery-2.1.1.intellisense.js" />
     <Content Include="Scripts\app\AppLogic.js" />
+    <Content Include="Scripts\app\Modules\OpenLayers.js" />
     <Content Include="Scripts\app\routes.js" />
     <Content Include="Scripts\app\Setup\Init.js" />
     <Content Include="Scripts\app\Utils\Event.js" />
