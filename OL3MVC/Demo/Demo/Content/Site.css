@@ -62,3 +62,7 @@ textarea {
     right: 0;
 }
 
+
+.ui-layout-toggler{
+    background-color: lightblue;
+}

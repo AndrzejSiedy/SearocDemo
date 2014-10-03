@@ -35,8 +35,8 @@ Gnx.Layout = function () {
                 , togglerLength_closed: '100%'
                 , togglerLength_open: '100%'
 
-                , togglerContent_open: '<div class="west-toggler-collapse"><span class="icon-arrow-up-3" style="font-size:22px;"/> Hide right panel</div>'
-                , togglerContent_closed: '<div class="west-toggler-expand"><span class="icon-arrow-up-3" style="font-size:22px;"/> Show right panel</div>'
+                , togglerContent_open: '<div class="west-toggler-collapse"><span class="glyphicon glyphicon-circle-arrow-left" style="font-size:22px;"/> <p>Hide right panel</p></div>'
+                , togglerContent_closed: '<div class="west-toggler-expand"><span class="glyphicon glyphicon-circle-arrow-right" style="font-size:22px;"/> <p>Show right panel</p></div>'
 
                 //, onresize: westResizeCallback
                 , onresize_start: westResizeCallback
