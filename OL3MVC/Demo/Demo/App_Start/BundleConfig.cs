@@ -40,6 +40,15 @@ namespace Demo
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
 
+            // Gnx modules
+            bundles.Add(new ScriptBundle("~/app/Gnx").Include(
+                    "~/Scripts/app/Utils/Utils.js",
+                    "~/Scripts/app/Setup/Init.js",
+                    "~/Scripts/app/Utils/Event.js",
+                    "~/Scripts/app/Views/Layout.js",
+                    "~/Scripts/app/Views/Center.js",
+                    "~/Scripts/app/AppLogic.js"));
+
             // Set EnableOptimizations to false for debugging. For more information,
             // visit http://go.microsoft.com/fwlink/?LinkId=301862
             BundleTable.EnableOptimizations = true;

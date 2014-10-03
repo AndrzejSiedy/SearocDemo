@@ -19,8 +19,8 @@
                 // Cannot start app when DOM is not read/visible on init
                 // Hence init app after first time app-view gets rendered
                 if (!app_initiated) {
-                    //Gnx.init();
-                    //Gnx.appStart();
+                    Gnx.init();
+                    Gnx.appStart();
 
                     //app_initiated = true;
                 }

@@ -9,6 +9,11 @@
     @Scripts.Render("~/bundles/jquery")
 
 
+    @Scripts.Render("~/bundles/bootstrap")
+
+    @Styles.Render("~/bundles/jqueryUiCss")
+    @Scripts.Render("~/bundles/jQueryUi")
+
     @*jQuery Layout plugin inspired by ExiJs border layout*@
     <link type="text/css" rel="stylesheet" href="//layout.jquery-dev.com/lib/css/layout-default-latest.css" />
     <script type="text/javascript" src="//layout.jquery-dev.com/lib/js/jquery-ui-latest.js"></script>
@@ -41,16 +46,14 @@
     </div>
     <div class="container body-content">
         @RenderBody()
-        <hr />
-        <footer>
+        <footer id="_footer" class="footer">
             <p>&copy; @DateTime.Now.Year -Demo ASP.NET Application</p>
         </footer>
     </div>
 
-    @Scripts.Render("~/bundles/bootstrap")
+    
 
-    @Styles.Render("~/bundles/jqueryUiCss")
-    @Scripts.Render("~/bundles/jQueryUi")
+    @Scripts.Render("~/app/Gnx")
 
     
     @RenderSection("scripts", required: false)

@@ -1,15 +1,9 @@
 ﻿<section id="demo-view" class="subpage-body view">
 
-    @{
-        ViewBag.Title = "Demo";
-    }
-    <h2>@ViewBag.Title.</h2>
-    <h3>@ViewBag.Message</h3>
-
     <div id="wrapper">
         <!-- the content -->
         <div id="sub-content-center">
-            <div class="pane ui-layout-center">
+            <div class="ui-layout-center">
                 @*need this wrapping div to show propperly load mask if needed in feature*@
                 <div style="position: absolute; top: 0px; left: 0px; height: 100%; width:100%; overflow:auto; padding: 5px;">
                     @*actuall container that should be used to place anything inside center pane(panel)*@
@@ -19,10 +13,8 @@
                     </div>
                 </div>
             </div>
-            <div id="west-pane-div" class="pane ui-layout-west">
-                <div style="position: relative; height: 100%; width:100%; overflow:auto;">
-                    <div id="freewall" class="free-wall"></div>
-                </div>
+            <div id="west-pane-div" class="ui-layout-west">
+                west
             </div>
         </div>
     </div>
