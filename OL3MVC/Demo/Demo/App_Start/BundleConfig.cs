@@ -10,6 +10,8 @@ namespace Demo
         {
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js",
+                        // knockoutJs
+                        "~/Scripts/knockout-{version}.js",
                         "~/Scripts/sammy-{version}.js",
                         // configure sammy to show/hide views in SPA maner
                         // it is a place where we initiate GNX app after DOM gets rendered first time
@@ -18,13 +20,15 @@ namespace Demo
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
 
-
+            // Customized jQuery UI
             bundles.Add(new ScriptBundle("~/bundles/jQueryUi").Include(
                         "~/Scripts/jquery-ui-1.11.1.custom/jquery-ui.js"));
 
             bundles.Add(new StyleBundle("~/bundles/jqueryUiCss").Include(
                         "~/Scripts/jquery-ui-1.11.1.custom/jquery-ui.css"));
 
+            bundles.Add(new ScriptBundle("~/bundles/OpenLayers2").Include(
+                        "~/Scripts/2.13.1/OpenLayers.js"));
 
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
@@ -49,6 +53,7 @@ namespace Demo
                     "~/Scripts/app/Views/Center.js",
                     "~/Scripts/app/Views/West.js",
                     "~/Scripts/app/Modules/OpenLayers.js",
+                    "~/Scripts/app/Modules/koWmsLayers.js",
                     "~/Scripts/app/AppLogic.js"));
 
             // Set EnableOptimizations to false for debugging. For more information,

@@ -31,13 +31,12 @@ Gnx.Layout = function () {
             , animatePaneSizing: true
             , spacing_open: 0
             , spacing_closed: 0
-
             , west: {
                 spacing_closed: 50
                 , spacing_open: 50
                 , size: '100%'
                 , minSize: 300
-                , maxSize: '70%'
+                , maxSize: '50%'
                 , initClosed: false
                 , togglerLength_closed: '100%'
                 , togglerLength_open: '100%'

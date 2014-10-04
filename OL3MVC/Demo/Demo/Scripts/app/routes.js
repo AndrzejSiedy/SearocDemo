@@ -21,7 +21,6 @@
                 if (!app_initiated) {
                     Gnx.init();
                     Gnx.appStart();
-
                     //app_initiated = true;
                 }
                 else {
