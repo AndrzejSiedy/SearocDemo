@@ -1,4 +1,4 @@
-﻿var WmsLayerModel = function (id, visible, queryable, name, title, getMapUrl, type, olLayer, isOnMap, bbox, bboxWGS84) {
+﻿var WmsLayerModel = function (id, visible, queryable, name, title, getMapUrl, type, olLayer, isOnMap) {
     var self = this;
 
     self.id = id;
@@ -11,9 +11,6 @@
     self.type = ko.observable(type);
     self.olLayer = olLayer;
     self.isOnMap = ko.observable(isOnMap);
-    self.bbox = bbox;
-    self.bboxWGS84 = bboxWGS84;
-
 
 
     // listen to visibility checkbox change
@@ -55,8 +52,6 @@ var WmsLayerViewModel = function (layers) {
 
 };
 
-var wmsLayerViewModel = new WmsLayerViewModel([
-    //{ visible: true, queryable: true, name: "Tall Hat", title: "39.95", type: 'WMS' },
-    //{ visible: false, queryable: true, name: "Long Cloak", title: "120.00", type: 'WFS' }
-]);
+// init ko ViewModel
+var wmsLayerViewModel = new WmsLayerViewModel([]);
 ko.applyBindings(wmsLayerViewModel);
