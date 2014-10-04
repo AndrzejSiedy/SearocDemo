@@ -1,6 +1,7 @@
-﻿var WmsLayerModel = function (visible, queryable, name, title, getMapUrl, type, olLayer, onMap) {
+﻿var WmsLayerModel = function (id, visible, queryable, name, title, getMapUrl, type, olLayer, isOnMap, bbox, bboxWGS84) {
     var self = this;
 
+    self.id = id;
     // observable are update elements upon changes, also update on element data changes [two way binding]
     self.visible = ko.observable(visible);
     self.queryable = ko.observable(queryable);
@@ -9,7 +10,10 @@
     self.getMapUrl = ko.observable(getMapUrl);
     self.type = ko.observable(type);
     self.olLayer = olLayer;
-    self.onMap = ko.observable(onMap);
+    self.isOnMap = ko.observable(isOnMap);
+    self.bbox = bbox;
+    self.bboxWGS84 = bboxWGS84;
+
 
 
     // listen to visibility checkbox change
@@ -25,7 +29,7 @@ var WmsLayerViewModel = function (layers) {
     self.layers = ko.observableArray(layers);
 
     self.registerLayer = function (l) {
-        self.layers.push(new WmsLayerModel(l.visible, l.queryable, l.Name, l.Title, l.getMapUrl, l.type, l.olLayer, l.onMap));
+        self.layers.push(new WmsLayerModel(l.id, l.visible, l.queryable, l.Name, l.Title, l.getMapUrl, l.type, l.olLayer, l.isOnMap));
     };
 
     self.addLayer2Map = function (l) {
@@ -34,9 +38,10 @@ var WmsLayerViewModel = function (layers) {
         Gnx.Event.fireEvent('add-layer', l);
     };
 
-    self.removeLayer = function (layer) {
-        layer.onMap(false);
-        self.layers.remove(layer);
+    self.removeLayer = function (l) {
+        l.isOnMap(false);
+        Gnx.Event.fireEvent('remove-layer', l);
+        self.layers.remove(l);
     };
 
     self.removeAllLayers = function () {
