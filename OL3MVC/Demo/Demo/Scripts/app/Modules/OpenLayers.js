@@ -10,6 +10,8 @@ Gnx.OpenLayers = function () {
 
     // loaded layers store
     this.layers = [];
+    // map object
+    this.map = null;
 
     var _init = function () {
         // get center panel - clear it up, and create ol3 map container
@@ -121,9 +123,37 @@ Gnx.OpenLayers = function () {
 
 
     var _onAddLayer = function (evt, data) {
-        data.onMap(true);
+
+        var lFromLocalStore = self.getLayerById(data.id);
+        if (!lFromLocalStore) return;
+        
+        data.isOnMap(true);
         data.visible(true);
         self.map.addLayer(data.olLayer);
+    };
+
+    var _onRemoveLayer = function (evt, data) {
+        // get layer in stored layers
+        for (var i = 0 ; i < self.layers.length; i++) {
+            var l = self.layers[i];
+            if (l.id == data.id) {
+                self.map.removeLayer(l.olLayer);
+                self.layers.splice(i, 1);
+                break;
+            }
+        }
+    };
+
+    self.getLayerById = function (id) {
+        for (var i = 0 ; i < self.layers.length; i++) {
+            var l = self.layers[i];
+            if (l.id == id) {
+                return l;
+                break;
+            }
+        }
+
+        return null;
     };
 
     // set layer visibility 
@@ -133,28 +163,29 @@ Gnx.OpenLayers = function () {
 
     var _registerWmsLayer = function (layer) {
 
+        // create ol3 layer
         var sourceParams = {
             url: layer.getMapUrl,
             params: { 'LAYERS': layer.Name },
             serverType: 'geoserver'
         };
 
-        var wmsLayer = new ol.layer.Image({
+        var l = new ol.layer.Image({
             source: new ol.source.ImageWMS(sourceParams),
             visible: true
         });
 
-        layer.olLayer = wmsLayer;
-
+        // add back reference to the layer record
+        layer.olLayer = l;
+        // add to stored data
         self.layers.push(layer);
     };
 
 
     var _removeAllLayers = function () {
-
         // remove all WMS loaded layers from local store
         while (self.layers.length > 0) {
-            self.map.removeLayer(self.layers[0]);
+            self.map.removeLayer(self.layers[0].olLayer);
             self.layers.splice(0, 1);
         }
         // remove layers from knockout object
@@ -165,9 +196,8 @@ Gnx.OpenLayers = function () {
     var _parseWmsCapabilities = function(rawData){
         var parser = new ol.format.WMSCapabilities();
         var result = parser.read(rawData);
-
-        var layers = result.Capability.Layer.Layer;
         
+        var layers = result.Capability.Layer.Layer;
         var getMapUrl = result.Capability.Request.GetMap.DCPType[0].HTTP.Get.OnlineResource.split('?')[0] + '?';
 
         // clear off all loaded previously layers from knockout model
@@ -180,6 +210,9 @@ Gnx.OpenLayers = function () {
             // inject extra parameters
             l.getMapUrl = getMapUrl;
             l.onMap = false;
+
+            // add unique layer indentifier;
+            l.id = $.getUuid();
 
             // register & prepare layer
             _registerWmsLayer(l);
@@ -308,9 +341,11 @@ Gnx.OpenLayers = function () {
 
         // listen to event called from koWmsViewModel
         Gnx.Event.on('add-layer', _onAddLayer);
+        Gnx.Event.on('remove-layer', _onRemoveLayer);
 
         // user changed layer visibility in data grid
         Gnx.Event.on('set-layer-visibility-change', _onLayerVisibilityChange);
+
 
         
 
