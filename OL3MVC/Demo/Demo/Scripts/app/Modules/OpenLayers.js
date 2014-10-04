@@ -186,7 +186,7 @@ Gnx.OpenLayers = function () {
             type: "GET",
             url: url,
             success: function (data) {
-                _parseWfsCapabilities(data);
+                //_parseWfsCapabilities(data);
                 console.warn('wfs capabilities', data);
             },
             error: function (data) {
