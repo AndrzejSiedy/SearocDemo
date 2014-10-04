@@ -36,7 +36,7 @@ Gnx.Layout = function () {
                 , spacing_open: 50
                 , size: '100%'
                 , minSize: 300
-                , maxSize: '50%'
+                , maxSize: '70%'
                 , initClosed: false
                 , togglerLength_closed: '100%'
                 , togglerLength_open: '100%'
