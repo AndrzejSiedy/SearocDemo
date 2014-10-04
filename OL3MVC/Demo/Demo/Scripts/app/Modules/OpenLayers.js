@@ -73,6 +73,23 @@ Gnx.OpenLayers = function () {
               //wmsLayer,
               //wmsLayer1
             ],
+            controls: ol.control.defaults({
+                attributionOptions: {
+                    collapsible: false
+                }
+            }).extend([
+                new ol.control.ScaleLine(),
+                new ol.control.MousePosition({
+                    //projection: ol.proj.get('EPSG:4326'),
+                    coordinateFormat: function (coords) {
+                        var output = '';
+                        if (coords) {
+                            output = coords[0].toFixed(5) + ' : ' + coords[1].toFixed(5);
+                        }
+                        return output;
+                    }
+                })
+            ]),
             view: view
         });
 
@@ -126,10 +143,29 @@ Gnx.OpenLayers = function () {
 
         var lFromLocalStore = self.getLayerById(data.id);
         if (!lFromLocalStore) return;
-        
+
         data.isOnMap(true);
         data.visible(true);
         self.map.addLayer(data.olLayer);
+
+
+        var mapProjection = self.map.getView().getProjection();
+        var mapProjCode = mapProjection.getCode();
+
+        // try to zoom to added layer
+        try{
+            // get bounding box for layer from capabilities
+            var bbox = lFromLocalStore.BoundingBox[1];
+            var lProjCode = bbox.crs;
+
+            var extent = ol.proj.transformExtent(lFromLocalStore.EX_GeographicBoundingBox, 'EPSG:4326', mapProjCode);
+
+            self.map.getView().fitExtent(extent, self.map.getSize());
+        }
+        catch(ex){
+            // silent fail
+        }
+        
     };
 
     var _onRemoveLayer = function (evt, data) {
@@ -193,10 +229,10 @@ Gnx.OpenLayers = function () {
 
     };
 
-    var _parseWmsCapabilities = function(rawData){
+    var _parseWmsCapabilities = function (rawData) {
         var parser = new ol.format.WMSCapabilities();
         var result = parser.read(rawData);
-        
+
         var layers = result.Capability.Layer.Layer;
         var getMapUrl = result.Capability.Request.GetMap.DCPType[0].HTTP.Get.OnlineResource.split('?')[0] + '?';
 
@@ -209,7 +245,8 @@ Gnx.OpenLayers = function () {
 
             // inject extra parameters
             l.getMapUrl = getMapUrl;
-            l.onMap = false;
+            l.isOnMap = false;
+            l.type = 'WMS';
 
             // add unique layer indentifier;
             l.id = $.getUuid();
@@ -221,8 +258,7 @@ Gnx.OpenLayers = function () {
             wmsLayerViewModel.registerLayer(l);
         }
 
-        console.warn(result);
-    }
+    };
 
     var _parseWfsCapabilities = function (rawData) {
         var parser = new ol.format.WFSCapabilities();
@@ -232,7 +268,7 @@ Gnx.OpenLayers = function () {
 
     // simple method conatinating user, pass and url
     var _getWmsCapabilities = function (evt, data) {
-        
+
         var url = data.url;
 
         if (url.indexOf('service') == -1) {
@@ -271,7 +307,7 @@ Gnx.OpenLayers = function () {
         // make capabilities request
         $.ajax(options)
 
-    }
+    };
 
     // simple method conatinating user, pass and url
     var _getWfsCapabilities = function (evt, data) {
@@ -317,21 +353,18 @@ Gnx.OpenLayers = function () {
 
     }
 
-    this.init = function () {
 
-        if (_initialized) return;
 
-        _init();
-
-        this.initialized = _initialized = true;
-
+    var bindUiEvents = function () {
         // capture west pane resize
         Gnx.Event.on('layout-west-resize-start', onWestResizeStart);
         Gnx.Event.on('layout-west-resize-end', onWestResizeEnd);
 
         Gnx.Event.on('layout-west-open-end', onWestOpenEnd);
         Gnx.Event.on('layout-west-close-end', onWestCloseEnd);
+    };
 
+    var bindAppEvent = function () {
         // bind callbact to user clicked "get WMS Capabilities
         Gnx.Event.on('get-wms-capabilities', _getWmsCapabilities);
         // bind callbact to user clicked "get WFS Capabilities
@@ -345,11 +378,20 @@ Gnx.OpenLayers = function () {
 
         // user changed layer visibility in data grid
         Gnx.Event.on('set-layer-visibility-change', _onLayerVisibilityChange);
+    };
 
+    this.init = function () {
 
+        if (_initialized) return;
+
+        _init();
+
+        this.initialized = _initialized = true;
+
+        bindUiEvents();
+        bindAppEvent();
         
 
-
         return this.initialized;
-    }
+    };
 };
