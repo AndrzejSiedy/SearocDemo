@@ -13,10 +13,12 @@ Gnx.OpenLayers = function () {
     // map object
     this.map = null;
 
+    this.proxy = '/Proxy/xDomainProxy.ashx?url=';
+
     var _init = function () {
         // get center panel - clear it up, and create ol3 map container
         $('#center-inner').empty();
-
+            
         self.mapDivId = $.getUuid();
     };
 
@@ -53,8 +55,9 @@ Gnx.OpenLayers = function () {
         });
 
         var view = new ol.View({
-            center: ol.proj.transform([37.41, 8.82], 'EPSG:4326', 'EPSG:3857'),
-            zoom: 4
+            center: [-8234182.45122, 4980466.18673],
+            maxZoom: 19,
+            zoom: 11
         });
 
         //base layers
@@ -65,6 +68,68 @@ Gnx.OpenLayers = function () {
             source: new ol.source.OSM(),
             title: 'OSM'
         });
+
+
+
+        
+
+        //var vectorSource = new ol.source.ServerVector({
+        //    format: new ol.format.GeoJSON(),
+        //    loader: function (extent, resolution, projection) {
+        //        var url = 'http://localhost:8080/geoserver/wfs?service=WFS&' +
+        //            'version=1.1.0&request=GetFeature&typename=osm:water_areas&' +
+        //            'outputFormat=JSON' +
+        //            //'outputFormat=text/javascript&format_options=callback:loadFeatures' +
+        //            '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
+        //        $.ajax({
+        //            url: url,
+        //            //dataType: 'jsonp',
+        //            success: function (response) {
+        //                console.warn('xxx', response);
+        //            }
+        //        });
+        //    },
+        //    strategy: ol.loadingstrategy.createTile(new ol.tilegrid.XYZ({
+        //        maxZoom: 19
+        //    })),
+        //    projection: 'EPSG:3857'
+        //});
+
+        //var loader = function (extent, resolution, projection) {
+        //    var url = 'http://demo.opengeo.org/geoserver/wfs?service=WFS&' +
+        //        'version=1.1.0&request=GetFeature&typename=osm:water_areas&' +
+        //        'outputFormat=text/javascript&format_options=callback:loadFeatures' +
+        //        '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
+        //    $.ajax({
+        //        url: url,
+        //        dataType: 'jsonp',
+        //        success: function (response) {
+        //            console.warn('xxx', response);
+        //        }
+        //    });
+        //};
+
+        //var loadFeatures = function (response) {
+        //    vectorSource.addFeatures(vectorSource.readFeatures(response));
+        //};
+
+        //var vector = new ol.layer.Vector({
+        //    source: vectorSource,
+        //    style: new ol.style.Style({
+        //        stroke: new ol.style.Stroke({
+        //            color: 'rgba(0, 0, 255, 1.0)',
+        //            width: 2
+        //        })
+        //    })
+        //});
+
+
+
+
+
+
+
+
 
         self.map = new ol.Map({
             target: mapDivId,
@@ -205,7 +270,7 @@ Gnx.OpenLayers = function () {
         }
     };
 
-    self.getLayerById = function (id) {
+    this.getLayerById = function (id) {
         for (var i = 0 ; i < self.layers.length; i++) {
             var l = self.layers[i];
             if (l.id == id) {
@@ -259,6 +324,8 @@ Gnx.OpenLayers = function () {
         var parser = new ol.format.WMSCapabilities();
         var result = parser.read(rawData);
 
+        console.warn('WMS caps', result);
+
         var layers = result.Capability.Layer.Layer;
         var getMapUrl = result.Capability.Request.GetMap.DCPType[0].HTTP.Get.OnlineResource.split('?')[0] + '?';
 
@@ -287,9 +354,9 @@ Gnx.OpenLayers = function () {
     };
 
     var _parseWfsCapabilities = function (rawData) {
-        var parser = new ol.format.WFSCapabilities();
+        var parser = new OpenLayers.Format.WFSCapabilities({});
         var result = parser.read(rawData);
-        console.warn(result);
+        console.warn('WFS', result);
     }
 
     // simple method conatinating user, pass and url
@@ -304,8 +371,7 @@ Gnx.OpenLayers = function () {
             url = url + '&request=GetCapabilities';
         }
 
-        var proxy = '/Proxy/xDomainProxy.ashx?url=';
-        url = proxy + url;
+        url = self.proxy + url;
 
         var options = {
             type: "GET",
@@ -338,6 +404,75 @@ Gnx.OpenLayers = function () {
     // simple method conatinating user, pass and url
     var _getWfsCapabilities = function (evt, data) {
 
+
+
+        var vectorSource = new ol.source.ServerVector({
+            format: new ol.format.GeoJSON(),
+            loader: function (extent, resolution, projection) {
+                var url = self.proxy + 'http://localhost:8080/geoserver/wfs?service=WFS&' +
+                    'version=1.1.0&request=GetFeature&typename=tiger:poly_landmarks&' +
+                    'outputFormat=JSON' +
+                    //'outputFormat=text/javascript&format_options=callback:loadFeatures' +
+                    '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
+                $.ajax({
+                    url: url,
+                    //dataType: 'jsonp',
+                    success: function (response) {
+                        loadFeatures(response);
+                    }
+                });
+            },
+            strategy: ol.loadingstrategy.createTile(new ol.tilegrid.XYZ({
+                maxZoom: 19
+            })),
+            projection: 'EPSG:3857'
+        });
+
+        // Variant 1 - loaded uses require proxy due to CORS
+        //this.loader = function (extent, resolution, projection) {
+        //    var url = self.proxy + 'http://localhost:8080/geoserver/wfs?service=WFS&' +
+        //        'version=1.1.0&request=GetFeature&typename=tiger:poly_landmarks&' +
+        //        'outputFormat=JSON' +
+        //        '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
+        //    $.ajax({
+        //        url: url,
+        //        //dataType: 'jsonp',
+        //        success: function (response) {
+        //            self.loadFeatures(response);
+        //        }
+        //    });
+        //};
+
+        // Variant 2 - loaded uses JSONP, and requres "format_options=callback" to be global variable
+        this.loader = function (extent, resolution, projection) {
+            var url = self.proxy + 'http://localhost:8080/geoserver/wfs?service=WFS&' +
+                'version=1.1.0&request=GetFeature&typename=tiger:poly_landmarks&' +
+                'outputFormat=text/javascript&format_options=callback:Gnx.ol3.loadFeatures' +
+                '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
+            $.ajax({
+                url: url,
+                dataType: 'jsonp'
+            });
+        };
+
+        
+        self.loadFeatures = function (response) {
+            vectorSource.addFeatures(vectorSource.readFeatures(response));
+        };
+
+        var vector = new ol.layer.Vector({
+            source: vectorSource,
+            style: new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: 'rgba(0, 0, 255, 1.0)',
+                    width: 2
+                })
+            })
+        });
+
+        self.map.addLayer(vector);
+
+
         var url = data.url;
 
         if (url.indexOf('service') == -1) {
@@ -347,15 +482,16 @@ Gnx.OpenLayers = function () {
             url = url + '&request=GetCapabilities';
         }
 
-        var proxy = '/Proxy/xDomainProxy.ashx?url=';
-        url = proxy + url;
+        // force version for OL2 WFSCapabilities parser
+        url = url + '&version=1.0.0';
+
+        url = self.proxy + url;
 
         var options = {
             type: "GET",
             url: url,
             success: function (data) {
-                //_parseWfsCapabilities(data);
-                console.warn('wfs capabilities', data);
+                _parseWfsCapabilities(data);
             },
             error: function (data) {
                 console.warn('error', data);
