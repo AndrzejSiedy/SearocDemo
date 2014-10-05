@@ -98,31 +98,57 @@ Gnx.OpenLayers = function () {
         });
 
         // add layer switcher
-        var layerSwitcher = new ol.control.LayerSwitcher();
-        self.map.addControl(layerSwitcher);
+        //var layerSwitcher = new ol.control.LayerSwitcher();
+        //self.map.addControl(layerSwitcher);
 
         self.map.on('singleclick', function (evt) {
-            var viewResolution = /** @type {number} */ (view.getResolution());
-            var url = wmsSource1.getGetFeatureInfoUrl(
-                evt.coordinate, viewResolution, 'EPSG:3857',
-                { 'INFO_FORMAT': 'text/html' });
-            if (url) {
 
-                $("#dialog-info").html('<iframe seamless src="' + url + '"></iframe>').dialog({
-                    resizable: false,
-                    modal: true,
-                    title: "Missing field value",
-                    height: 250,
-                    width: 400,
-                    buttons: {
-                        "OK": function () {
-                            $(this).dialog('close');
-                        }
-                    }
-                });
-            }
+
+            getFeatureInfo(evt);
+
+            //var viewResolution = /** @type {number} */ (view.getResolution());
+            //var url = wmsSource1.getGetFeatureInfoUrl(
+            //    evt.coordinate, viewResolution, 'EPSG:3857',
+            //    { 'INFO_FORMAT': 'text/html' });
+            //if (url) {
+
+            //    $("#dialog-info").html('<iframe seamless src="' + url + '"></iframe>').dialog({
+            //        resizable: false,
+            //        modal: true,
+            //        title: "Missing field value",
+            //        height: 250,
+            //        width: 400,
+            //        buttons: {
+            //            "OK": function () {
+            //                $(this).dialog('close');
+            //            }
+            //        }
+            //    });
+            //}
         });
 
+    };
+
+    var getFeatureInfo = function (evt) {
+
+        var mapProjection = self.map.getView().getProjection();
+        var mapProjCode = mapProjection.getCode();
+
+        var viewResolution = /** @type {number} */ (self.map.getView().getResolution());
+
+        for (var i = 0 ; i < self.layers.length; i++) {
+            var l = self.layers[i];
+
+            if (l.queryable && l.isOnMap && l.olLayer.getVisible()) {
+                var url = l.olLayer.getSource().getGetFeatureInfoUrl(
+                    evt.coordinate, viewResolution, mapProjCode,
+                    { 'INFO_FORMAT': 'text/html' });
+                if (url) {
+                    console.warn('GFI url', l.olLayer.title, url);
+                }
+                
+            }
+        }
     };
 
     // callbacks to resize map when parent container size change
@@ -156,6 +182,8 @@ Gnx.OpenLayers = function () {
         data.visible(true);
         self.map.addLayer(data.olLayer);
 
+
+        lFromLocalStore.isOnMap = true;
 
         var mapProjection = self.map.getView().getProjection();
         var mapProjCode = mapProjection.getCode();
