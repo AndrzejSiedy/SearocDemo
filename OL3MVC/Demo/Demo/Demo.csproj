@@ -618,6 +618,9 @@
     <Content Include="Scripts\knockout-3.2.0.debug.js" />
     <Content Include="Scripts\knockout-3.2.0.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\ol3-layerswitcher\src\logo.png" />
+    <Content Include="Scripts\ol3-layerswitcher\src\ol3-layerswitcher.css" />
+    <Content Include="Scripts\ol3-layerswitcher\src\ol3-layerswitcher.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
@@ -640,6 +643,7 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\Welcome.cshtml" />
+    <Content Include="Scripts\ol3-layerswitcher\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
