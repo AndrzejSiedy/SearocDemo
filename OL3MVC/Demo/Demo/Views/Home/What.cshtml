@@ -24,9 +24,16 @@
             <li>
                 <p>Consider using other MVC, MVVM libraries</p>
                 <ul>
-                    <li>Sencha ExtJs - commercial/GPL JavaScript library for building enterprice level web application. </li>
+                    <li>Sencha ExtJs - commercial/GPL JavaScript library for building enterprice level web application. See <a href="http://test1.konwencjakarpacka.pl/milosnicy-regionu/mapa-milosnikow" target="_blank">ExtJs Mapping app created last year</a></li>
                     <li>Dojo - opensource free JavaScript library for building enterprice level web application. </li>
                     <li>Concider Durpal, Angular, or other MVC, MVVM libraries</li>
+                </ul>
+            </li>
+            <li>
+                <p>Register SLD on GeoServer</p>
+                <ul>
+                    <li>Using cURL</li>
+                    curl -v -u admin:geoserver -XPOST -H "Content-type: text/xml" -d "file:///E:\geoserver_training\stylefile.sld" "http://localhost:8080/geoserver/rest/styles""
                 </ul>
             </li>
         </ul>
