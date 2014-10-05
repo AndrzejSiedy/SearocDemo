@@ -70,67 +70,6 @@ Gnx.OpenLayers = function () {
         });
 
 
-
-        
-
-        //var vectorSource = new ol.source.ServerVector({
-        //    format: new ol.format.GeoJSON(),
-        //    loader: function (extent, resolution, projection) {
-        //        var url = 'http://localhost:8080/geoserver/wfs?service=WFS&' +
-        //            'version=1.1.0&request=GetFeature&typename=osm:water_areas&' +
-        //            'outputFormat=JSON' +
-        //            //'outputFormat=text/javascript&format_options=callback:loadFeatures' +
-        //            '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
-        //        $.ajax({
-        //            url: url,
-        //            //dataType: 'jsonp',
-        //            success: function (response) {
-        //                console.warn('xxx', response);
-        //            }
-        //        });
-        //    },
-        //    strategy: ol.loadingstrategy.createTile(new ol.tilegrid.XYZ({
-        //        maxZoom: 19
-        //    })),
-        //    projection: 'EPSG:3857'
-        //});
-
-        //var loader = function (extent, resolution, projection) {
-        //    var url = 'http://demo.opengeo.org/geoserver/wfs?service=WFS&' +
-        //        'version=1.1.0&request=GetFeature&typename=osm:water_areas&' +
-        //        'outputFormat=text/javascript&format_options=callback:loadFeatures' +
-        //        '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
-        //    $.ajax({
-        //        url: url,
-        //        dataType: 'jsonp',
-        //        success: function (response) {
-        //            console.warn('xxx', response);
-        //        }
-        //    });
-        //};
-
-        //var loadFeatures = function (response) {
-        //    vectorSource.addFeatures(vectorSource.readFeatures(response));
-        //};
-
-        //var vector = new ol.layer.Vector({
-        //    source: vectorSource,
-        //    style: new ol.style.Style({
-        //        stroke: new ol.style.Stroke({
-        //            color: 'rgba(0, 0, 255, 1.0)',
-        //            width: 2
-        //        })
-        //    })
-        //});
-
-
-
-
-
-
-
-
-
         self.map = new ol.Map({
             target: mapDivId,
             layers: [
@@ -236,26 +175,30 @@ Gnx.OpenLayers = function () {
         data.visible(true);
         self.map.addLayer(data.olLayer);
 
-
         lFromLocalStore.isOnMap = true;
 
         var mapProjection = self.map.getView().getProjection();
         var mapProjCode = mapProjection.getCode();
 
-        // try to zoom to added layer
-        try{
-            // get bounding box for layer from capabilities
-            var bbox = lFromLocalStore.BoundingBox[1];
-            var lProjCode = bbox.crs;
 
-            var extent = ol.proj.transformExtent(lFromLocalStore.EX_GeographicBoundingBox, 'EPSG:4326', mapProjCode);
+        // WMS layer
+        if (data.type == 'WMS') {
+            // try to zoom to added layer
+            try{
+                // get bounding box for layer from capabilities
+                var bbox = lFromLocalStore.BoundingBox[1];
+                var lProjCode = bbox.crs;
 
-            self.map.getView().fitExtent(extent, self.map.getSize());
+                var extent = ol.proj.transformExtent(lFromLocalStore.EX_GeographicBoundingBox, 'EPSG:4326', mapProjCode);
+
+                self.map.getView().fitExtent(extent, self.map.getSize());
+            }
+            catch(ex){
+                // silent fail
+            }
         }
-        catch(ex){
-            // silent fail
-        }
-        
+
+        // zoom to WFS layers can be done only after data are loaded - this is done in "loadFeatures" method
     };
 
     var _onRemoveLayer = function (evt, data) {
@@ -349,6 +292,8 @@ Gnx.OpenLayers = function () {
 
         var loadFeatures = function (response) {
             vectorSource.addFeatures(vectorSource.readFeatures(response));
+            // after data loaded zoom to layer data extent
+            self.map.getView().fitExtent(vectorSource.getExtent(), self.map.getSize());
         };
 
         var vector = new ol.layer.Vector({
