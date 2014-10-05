@@ -317,17 +317,18 @@ Gnx.OpenLayers = function () {
             self.layers.splice(0, 1);
         }
         // remove layers from knockout object
-        wmsLayerViewModel.removeAllLayers();
+        layerViewModel.removeAllLayers();
 
     };
 
-    var _wfsRawLayersDataReady = function (evt, data) {
-        console.warn('process blooedy WFS layers', data);
+    var _registerWfsLayer = function (data) {
+
+        var urlStr = self.proxy + data.href.get;
 
         var loader = function (extent, resolution, projection) {
-            var url = self.proxy + 'http://localhost:8080/geoserver/ows?service=WFS&' +
-                'version=1.1.0&request=GetFeature&typename=tiger:poly_landmarks&' +
-                'outputFormat=JSON' +
+            var url = urlStr +
+                '&service=WFS&version=1.1.0&typename=' + data.ns + ':' + data.name +
+                '&outputFormat=JSON' +
                 '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
             $.ajax({
                 url: url,
@@ -360,14 +361,50 @@ Gnx.OpenLayers = function () {
             })
         });
 
-        self.map.addLayer(vector);
+        var layer = data;
+        // add unique layer indentifier;
+        layer.id = $.getUuid();
+        
+        // inject extra parameters
+        // NOTE - duplicated properties are used for registering WFS layer with knockout module
+        // when in proper development - models, props names etc. need to be syncronised, or separate classed should be created
+        layer.visible = false;
+        layer.Name = data.ns + ':' + data.name;
+        layer.Title = layer.name;
+        layer.getMapUrl = null;
+        layer.getFeatureUrl = urlStr;
+        layer.isOnMap = false;
+        layer.type = 'WFS';
+        layer.queryable = true;
+        layer.visible = false;
+        layer.olLayer = vector;
+
+
+
+        // add to stored data
+        self.layers.push(layer);
+
+        return layer;
+
+    };
+
+    var _wfsRawLayersDataReady = function (evt, data) {
+        var fts = data.featureTypeList.featureTypes;
+        var href = data.capability.request.getfeature.href;
+
+        // clear off any previously loaded layers
+        _removeAllLayers();
+
+        for (var i = 0; i < fts.length; i++) {
+            fts[i].href = href;
+            var l = _registerWfsLayer(fts[i]);
+            layerViewModel.registerLayer(l);
+        }
     };
 
     var _parseWmsCapabilities = function (rawData) {
         var parser = new ol.format.WMSCapabilities();
         var result = parser.read(rawData);
-
-        console.warn('WMS caps', result);
 
         var layers = result.Capability.Layer.Layer;
         var getMapUrl = result.Capability.Request.GetMap.DCPType[0].HTTP.Get.OnlineResource.split('?')[0] + '?';
@@ -391,7 +428,7 @@ Gnx.OpenLayers = function () {
             _registerWmsLayer(l);
 
             // add layer to the knockout model
-            wmsLayerViewModel.registerLayer(l);
+            layerViewModel.registerLayer(l);
         }
 
     };
@@ -439,10 +476,10 @@ Gnx.OpenLayers = function () {
     // matcher between GeoServer workspace Name and workspace Uri
     var _getGeoserverWorkspaces = function (req, wfsCaps) {
 
-        if (!req.responseText || req.responseText.length == 0) return;
+        if (!req || req.length == 0) return;
 
         var format = new OpenLayers.Format.XML();
-        var xmlDoc = format.read(req.responseText);
+        var xmlDoc = format.read(req);
         var match = [];
 
         if (xmlDoc && xmlDoc.activeElement && xmlDoc.activeElement.attributes) {
@@ -450,7 +487,7 @@ Gnx.OpenLayers = function () {
             for (var i = 0; i < attribs.length; i++) {
                 match.push({
                     workspaceName: attribs[i].localName,
-                    workspaceUri: attribs[i].nodeValue
+                    workspaceUri: attribs[i].value
                 });
             }
         }
@@ -461,8 +498,8 @@ Gnx.OpenLayers = function () {
             fTs[i].ns = getNameSpaceByUri(match, fTs[i].featureNS);
         }
 
+        // fire event internaly
         Gnx.Event.fireEvent('wfs-layers-ready-to-load', wfsCaps);
-
     };
 
     var getNameSpaceByUri = function (matchArr, uri) {
@@ -483,8 +520,6 @@ Gnx.OpenLayers = function () {
         // first need to get list of workspace name and assigned Namespace URI
         // when getting response from WfsCapabilities, we get Namespace URI only
         // but to build WFS layer we need Namespace NAME
-
-        
         var options = {
             type: "GET",
             url: self.proxy + url + 'SERVICE=WFS&VERSION=1.1.0&REQUEST=DescribeFeatureType',
