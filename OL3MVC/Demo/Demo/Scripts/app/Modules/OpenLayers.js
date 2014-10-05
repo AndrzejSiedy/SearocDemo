@@ -212,6 +212,7 @@ Gnx.OpenLayers = function () {
             }
             catch(ex){
                 // silent fail
+                console.warn('Failed to zoom to WMS layer');
             }
         }
         // zoom to WFS layers can be done only after data are loaded - this is done in "loadFeatures" method
@@ -277,7 +278,6 @@ Gnx.OpenLayers = function () {
         }
         // remove layers from knockout object
         layerViewModel.removeAllLayers();
-
     };
 
     var _registerWfsLayer = function (data) {
@@ -339,8 +339,6 @@ Gnx.OpenLayers = function () {
         layer.queryable = true;
         layer.visible = false;
         layer.olLayer = vector;
-
-
 
         // add to stored data
         self.layers.push(layer);
@@ -411,11 +409,17 @@ Gnx.OpenLayers = function () {
         var options = {
             type: "GET",
             url: url,
+            beforeSend: function(){
+                showGridLoadMask();
+            },
             success: function (data) {
                 _parseWmsCapabilities(data);
+                hideGridLoadMask();
             },
-            error: function (data) {
-                console.warn('error', data);
+            error: function (response) {
+                hideGridLoadMask();
+                console.warn('error', response);
+                showErrorInfo(response);
             }
         }
 
@@ -487,8 +491,9 @@ Gnx.OpenLayers = function () {
             success: function (response) {
                 _getGeoserverWorkspaces(response, result);
             },
-            error: function (data) {
-                console.warn('error', data);
+            error: function (response) {
+                console.warn('error', response);
+                showErrorInfo(response);
             }
         }
 
@@ -522,14 +527,21 @@ Gnx.OpenLayers = function () {
         var options = {
             type: "GET",
             url: url,
+            beforeSend: function(){
+                showGridLoadMask();
+            },
             success: function (response) {
                 _parseWfsCapabilities(response, data.url, {
                     username: data.userName,
                     password: data.password
                 });
+                hideGridLoadMask();
             },
             error: function (response) {
                 console.warn('error', response);
+                hideGridLoadMask();
+
+                showErrorInfo(response);
             }
         }
 
@@ -548,7 +560,33 @@ Gnx.OpenLayers = function () {
         // make capabilities request
         $.ajax(options);
 
-    }
+    };
+
+    var showErrorInfo = function (response) {
+        $("#dialog-info").html(response.status + ' ' + response.statusText);
+
+        // Define the Dialog and its properties.
+        $("#dialog-info").dialog({
+            resizable: false,
+            modal: true,
+            title: "Request failure",
+            height: 250,
+            width: 400,
+            buttons: {
+                "OK": function () {
+                    $(this).dialog('close');
+                }
+            }
+        });
+    };
+
+    var showGridLoadMask = function () {
+        $('.row').showLoadMask();
+    };
+
+    var hideGridLoadMask = function () {
+        $('.row').hideLoadMask();
+    };
 
     var bindUiEvents = function () {
         // capture west pane resize
@@ -557,6 +595,7 @@ Gnx.OpenLayers = function () {
 
         Gnx.Event.on('layout-west-open-end', onWestOpenEnd);
         Gnx.Event.on('layout-west-close-end', onWestCloseEnd);
+
     };
 
     var bindAppEvent = function () {
