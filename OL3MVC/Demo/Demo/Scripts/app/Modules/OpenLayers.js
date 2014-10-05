@@ -101,30 +101,12 @@ Gnx.OpenLayers = function () {
         //var layerSwitcher = new ol.control.LayerSwitcher();
         //self.map.addControl(layerSwitcher);
 
+        // add popup
+        self.popup = new ol.Overlay.Popup();
+        self.map.addOverlay(self.popup);
+
         self.map.on('singleclick', function (evt) {
-
-
             getFeatureInfo(evt);
-
-            //var viewResolution = /** @type {number} */ (view.getResolution());
-            //var url = wmsSource1.getGetFeatureInfoUrl(
-            //    evt.coordinate, viewResolution, 'EPSG:3857',
-            //    { 'INFO_FORMAT': 'text/html' });
-            //if (url) {
-
-            //    $("#dialog-info").html('<iframe seamless src="' + url + '"></iframe>').dialog({
-            //        resizable: false,
-            //        modal: true,
-            //        title: "Missing field value",
-            //        height: 250,
-            //        width: 400,
-            //        buttons: {
-            //            "OK": function () {
-            //                $(this).dialog('close');
-            //            }
-            //        }
-            //    });
-            //}
         });
 
     };
@@ -136,6 +118,8 @@ Gnx.OpenLayers = function () {
 
         var viewResolution = /** @type {number} */ (self.map.getView().getResolution());
 
+        var gfiIframes = '';
+
         for (var i = 0 ; i < self.layers.length; i++) {
             var l = self.layers[i];
 
@@ -144,11 +128,16 @@ Gnx.OpenLayers = function () {
                     evt.coordinate, viewResolution, mapProjCode,
                     { 'INFO_FORMAT': 'text/html' });
                 if (url) {
-                    console.warn('GFI url', l.olLayer.title, url);
+                    gfiIframes = gfiIframes +  '<br/><iframe seamless src="' + url + '"></iframe>';
                 }
                 
             }
         }
+
+        var prettyCoord = ol.coordinate.toStringHDMS(ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326'), 2);
+
+        var gfiHtml = '<div><p>' + prettyCoord + '</p></div>'
+        self.popup.show(evt.coordinate, '<div><h2>Coordinates</h2><p>' + prettyCoord + '</p>' + gfiIframes + '</div>');
     };
 
     // callbacks to resize map when parent container size change
