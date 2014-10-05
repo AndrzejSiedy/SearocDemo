@@ -343,3 +343,4 @@
 /// <reference path="2.13.1/lib/openlayers/protocol/wfs/v1_0_0.js" />
 /// <reference path="2.13.1/lib/openlayers/protocol/wfs/v1_1_0.js" />
 /// <reference path="2.13.1/lib/openlayers/tile/image/iframe.js" />
+/// <reference path="ol3-layerswitcher/src/ol3-layerswitcher.js" />
