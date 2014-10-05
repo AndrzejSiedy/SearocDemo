@@ -35,6 +35,10 @@
             $(".view").hide();
             $("#about-view").show("slide", { direction: "left" }, 500);
         });
+        this.get("#/whatelse", function (context) {
+            $(".view").hide();
+            $("#what-view").show("slide", { direction: "left" }, 500);
+        });
 
     });
 

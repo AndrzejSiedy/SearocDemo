@@ -571,7 +571,7 @@
     <Content Include="Scripts\2.13.1\theme\default\style.mobile.tidy.css" />
     <Content Include="Scripts\2.13.1\theme\default\style.tidy.css" />
     <Content Include="Scripts\app\AppLogic.js" />
-    <Content Include="Scripts\app\Modules\koWmsLayers.js" />
+    <Content Include="Scripts\app\Modules\koLayers.js" />
     <Content Include="Scripts\app\Modules\OpenLayers.js" />
     <Content Include="Scripts\app\routes.js" />
     <Content Include="Scripts\app\Setup\Init.js" />
@@ -650,6 +650,7 @@
     <Content Include="Views\Home\Welcome.cshtml" />
     <Content Include="Scripts\ol3-layerswitcher\README.md" />
     <Content Include="Scripts\ol3-popup\README.md" />
+    <Content Include="Views\Home\What.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

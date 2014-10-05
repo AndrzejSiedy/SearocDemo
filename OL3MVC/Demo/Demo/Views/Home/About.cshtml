@@ -1,10 +1,51 @@
 ﻿
-<section id="about-view" class="subpage-body view pane">
+<section id="about-view" class="subpage-body view initially-hidden-pane">
     @{
         ViewBag.Title = "About";
     }
     <div class="jumbotron shadow-light">
-        <h1>About</h1>
+        <h3>Technology</h3>
+        <ul>
+            <li>
+                <p>Sammy js - for navigation and history management.</p>
+                <ul>
+                    <li>All views are rendered as partial view in "~/Views/Home/Index.cshtml" using Razor Html.RenderPartial helper. </li>
+                    <li>Views internally have section tag with initially-hidden-pane class to prevent rendering DOM for view. </li>
+                    <li>Sammy "~/Scripts/app/routes.js" file defines how partial views are displayed when user navigates to views. </li>
+                </ul>
+            </li>
+            <li>
+                <p>Application</p> </p>
+                <ul>
+                    <li>Application is splitted into sub modules under "~/Scripts/app" all app scripts are registered in "~/App_Start/BundleConfig.cs" and renderd in "~/Views/Shared/_Layout.cshtml"</li>
+                    <li>Application isn't clasic MVC app but provides modularity. </li>
+                </ul>
+            </li>
+            <li>
+                <p>knockout js</p>
+                <ul>
+                    <li>For binding data between OpenLayers module (responsible for services communication) and layers data grid.</li>
+                </ul>
+            </li>
+            <li>
+                <p>ol3 - OpenLayers3</p>
+                <ul>
+                    <li>A high-performance, feature-packed library for all your mapping needs. :) </li>
+                </ul>
+            </li>
+            <li>
+                <p>OpenLayers2</p>
+                <ul>
+                    <li>Previous version of OpenLayers included and used because current ol3 v. 3.0.0 does not support WFS Capabilities </li>
+                </ul>
+            </li>
+            <li>
+                <p>jQuery plugins</p>
+                <ul>
+                    <li>jQuery Layout UI - Demo app layout</li>
+                    <li>ol3-popup - show GetFeatureInfo(wms), show vector feature data</li>
+                </ul>
+            </li>
+        </ul>
     </div>
-
 </section>

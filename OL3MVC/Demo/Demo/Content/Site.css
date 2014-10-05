@@ -39,7 +39,7 @@ textarea {
     margin: 15px;
 }
 
-.pane {
+.initially-hidden-pane {
     display: none; /* will appear when layout inits */
 }
 
