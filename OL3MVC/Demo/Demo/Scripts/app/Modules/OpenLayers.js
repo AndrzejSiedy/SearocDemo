@@ -31,6 +31,7 @@ Gnx.OpenLayers = function () {
 
         //var searoc:Bathy
         var wmsSource = new ol.source.ImageWMS({
+            title: 'ne:ne',
             url: 'http://demo.opengeo.org/geoserver/wms',
             params: { 'LAYERS': 'ne:ne' },
             serverType: 'geoserver'
@@ -41,6 +42,7 @@ Gnx.OpenLayers = function () {
         });
 
         var wmsSource1 = new ol.source.ImageWMS({
+            title: 'searoc:Bathy',
             url: 'http://gis-demo.seaplanner.com:8080/wms',
             params: { 'LAYERS': 'searoc:Bathy' },
             serverType: 'geoserver'
@@ -60,16 +62,18 @@ Gnx.OpenLayers = function () {
             //just mark the layer as the base layer, so it is possible to distinguish between hgis layers and the layers that are meant to act as base layers
             //ol3 does not really need a base layer
             is_base_layer: true,
-            source: new ol.source.OSM()
+            source: new ol.source.OSM(),
+            title: 'OSM'
         });
 
         self.map = new ol.Map({
             target: mapDivId,
             layers: [
-                osm
-              //new ol.layer.Tile({
-              //    source: new ol.source.MapQuest({ layer: 'sat' })
-              //})
+               //osm
+              new ol.layer.Tile({
+                  source: new ol.source.MapQuest({ layer: 'sat' }),
+                  title: 'Base-Sat'
+              })
               //wmsLayer,
               //wmsLayer1
             ],
@@ -92,6 +96,10 @@ Gnx.OpenLayers = function () {
             ]),
             view: view
         });
+
+        // add layer switcher
+        var layerSwitcher = new ol.control.LayerSwitcher();
+        self.map.addControl(layerSwitcher);
 
         self.map.on('singleclick', function (evt) {
             var viewResolution = /** @type {number} */ (view.getResolution());
@@ -208,7 +216,8 @@ Gnx.OpenLayers = function () {
 
         var l = new ol.layer.Image({
             source: new ol.source.ImageWMS(sourceParams),
-            visible: true
+            visible: true,
+            title: layer.Name
         });
 
         // add back reference to the layer record
