@@ -199,7 +199,7 @@ Gnx.OpenLayers = function () {
         var mapProjCode = mapProjection.getCode();
 
         // WMS layer
-        if (data.type == 'WMS') {
+        if (data.type() == 'WMS') {
             // try to zoom to added layer
             try{
                 // get bounding box for layer from capabilities
@@ -212,7 +212,7 @@ Gnx.OpenLayers = function () {
             }
             catch(ex){
                 // silent fail
-                console.warn('Failed to zoom to WMS layer');
+                console.warn('Failed to zoom to WMS layer', ex);
             }
         }
         // zoom to WFS layers can be done only after data are loaded - this is done in "loadFeatures" method
@@ -268,7 +268,6 @@ Gnx.OpenLayers = function () {
         // add to stored data
         self.layers.push(layer);
     };
-
 
     var _removeAllLayers = function () {
         // remove all WMS loaded layers from local store
@@ -489,7 +488,7 @@ Gnx.OpenLayers = function () {
             error: function (response) {
                 hideGridLoadMask();
                 console.warn('error', response);
-                showErrorInfo(response);
+                showErrorInfo("Request failure", response.status + ' ' + response.statusText);
             }
         }
 
@@ -563,7 +562,7 @@ Gnx.OpenLayers = function () {
             },
             error: function (response) {
                 console.warn('error', response);
-                showErrorInfo(response);
+                showErrorInfo("Request failure", response.status + ' ' + response.statusText);
             }
         }
 
@@ -611,7 +610,7 @@ Gnx.OpenLayers = function () {
                 console.warn('error', response);
                 hideGridLoadMask();
 
-                showErrorInfo(response);
+                showErrorInfo("Request failure", response.status + ' ' + response.statusText);
             }
         }
 
@@ -632,14 +631,14 @@ Gnx.OpenLayers = function () {
 
     };
 
-    var showErrorInfo = function (response) {
-        $("#dialog-info").html(response.status + ' ' + response.statusText);
+    var showErrorInfo = function (title, message) {
+        $("#dialog-info").html(message);
 
         // Define the Dialog and its properties.
         $("#dialog-info").dialog({
             resizable: false,
             modal: true,
-            title: "Request failure",
+            title: title,
             height: 250,
             width: 400,
             buttons: {
