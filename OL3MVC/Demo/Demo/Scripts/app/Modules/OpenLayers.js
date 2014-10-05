@@ -110,12 +110,13 @@ Gnx.OpenLayers = function () {
         self.map.addOverlay(self.popup);
 
         self.map.on('singleclick', function (evt) {
-            getFeatureInfo(evt);
+            getWmsFeatureInfo(evt);
+            getWfsFeatureInfo(evt);
         });
 
     };
 
-    var getFeatureInfo = function (evt) {
+    var getWmsFeatureInfo = function (evt) {
 
         var mapProjection = self.map.getView().getProjection();
         var mapProjCode = mapProjection.getCode();
@@ -127,21 +128,39 @@ Gnx.OpenLayers = function () {
         for (var i = 0 ; i < self.layers.length; i++) {
             var l = self.layers[i];
 
-            if (l.queryable && l.isOnMap && l.olLayer.getVisible()) {
+            if (l.queryable && l.isOnMap && l.olLayer.getVisible() && l.type == 'WMS') {
                 var url = l.olLayer.getSource().getGetFeatureInfoUrl(
                     evt.coordinate, viewResolution, mapProjCode,
                     { 'INFO_FORMAT': 'text/html' });
                 if (url) {
-                    gfiIframes = gfiIframes +  '<br/><iframe seamless src="' + url + '"></iframe>';
+                    gfiIframes = gfiIframes + '<br/><iframe seamless src="' + url + '"></iframe>';
+
+                    self.popup.show(evt.coordinate, '<div>' + gfiIframes + '</div>');
                 }
-                
+            }
+        }
+        
+    };
+
+    var getWfsFeatureInfo = function (evt) {
+        var pixel = evt.pixel;
+
+        var feature = self.map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+            return feature;
+        });
+
+        if (!feature) return;
+
+        var fProp = feature.getProperties();
+        var pData = '';
+        for (var p in fProp) {
+            if (p != 'geometry') {
+                pData = pData + '<p><b>' + p + '</b>: ' + fProp[p] + '</p>';
             }
         }
 
-        var prettyCoord = ol.coordinate.toStringHDMS(ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326'), 2);
+        self.popup.show(evt.coordinate, '<div>' + pData + '</div>');
 
-        var gfiHtml = '<div><p>' + prettyCoord + '</p></div>'
-        self.popup.show(evt.coordinate, '<div><h2>Coordinates</h2><p>' + prettyCoord + '</p>' + gfiIframes + '</div>');
     };
 
     // callbacks to resize map when parent container size change
@@ -165,7 +184,6 @@ Gnx.OpenLayers = function () {
         self.map.updateSize();
     };
 
-
     var _onAddLayer = function (evt, data) {
 
         var lFromLocalStore = self.getLayerById(data.id);
@@ -179,7 +197,6 @@ Gnx.OpenLayers = function () {
 
         var mapProjection = self.map.getView().getProjection();
         var mapProjCode = mapProjection.getCode();
-
 
         // WMS layer
         if (data.type == 'WMS') {
@@ -197,7 +214,6 @@ Gnx.OpenLayers = function () {
                 // silent fail
             }
         }
-
         // zoom to WFS layers can be done only after data are loaded - this is done in "loadFeatures" method
     };
 
