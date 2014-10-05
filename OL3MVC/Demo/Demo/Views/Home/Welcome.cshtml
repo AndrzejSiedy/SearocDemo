@@ -4,17 +4,33 @@
         ViewBag.Title = "Weclome Page";
     }
 
-    <div class="jumbotron">
-        <h1>Tasks</h1>
-        <p class="lead">Create simple MVC app</p>
-        <p class="lead">Create OpenLayers3 application</p>
+    <div class="jumbotron shadow-light">
+        <h2>Tasks</h2>
+        <p>
+            Create simple MVC app
+            <span class="bg-danger"> Used standard MVC5 template, converted to SPA app with Sammyjs lib.</span><i class="glyphicon glyphicon-ok" style="color:green"></i>
+        </p>
+
+        <p>Create OpenLayers3 application<i class="glyphicon glyphicon-ok" style="color:green"></i></p>
         <ul>
-            <li>Access GeoServer’s public URL at: on http://gis-demo.seaplanner.com:8080/web/ </li>
-            <li>Read services WMS/WFS capabilities </li>
-            <li>Use raster (WMS)/vector (WFS) layers</li>
-            <li>Use layer switcher</li>
-            <li>Create an SLD file to style the rendered vector data. - This could be only done if provided security credentials have rights to create style and style layers </li>
-            <li>Show popup on GetFeatureInfo </li>
+            <li>
+                Access GeoServer’s public URL at: on http://gis-demo.seaplanner.com:8080/web/
+                <span class="bg-danger">At some point on Saturday given service stoped responding, work was continiued with http://localhost:8080/geoserver</span>
+                <i class="glyphicon glyphicon-ok" style="color:green"></i>
+            </li>
+            <li>Read services WMS/WFS capabilities <i class="glyphicon glyphicon-ok" style="color:green;"></i></li>
+            <li>Use raster (WMS)/vector (WFS) layers <i class="glyphicon glyphicon-ok" style="color:green;"></i></li>
+            <li>
+                Use layer switcher<span class="bg-danger"> Created datagrid for basic layers management</span>
+                <i class="glyphicon glyphicon-ok" style="color:green;"></i>
+            </li>
+            <li>
+                Create an SLD file to style the rendered vector data. - This could be only done if provided security credentials have rights to create style and style layers
+                <span class="bg-danger">At some point on Saturday given service stoped responding, could not test this feature - with correct permission this could be done via cURL</span>
+                <i class="glyphicon glyphicon-minus" style="color:red;"></i>
+            </li>
+            <li>Show popup on GetFeatureInfo <i class="glyphicon glyphicon-ok" style="color:green;"></i></li>
+            <li>It would be nice to see at least a “bare-bones” unit test suite using jasmine or a js unit test suite of his choosing. <i class="glyphicon glyphicon-minus" style="color:red;"></i></li>
         </ul>
     </div>
 

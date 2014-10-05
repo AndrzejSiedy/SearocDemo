@@ -31,9 +31,9 @@
             });
         });
 
-        this.get("#/contact", function (context) {
+        this.get("#/about", function (context) {
             $(".view").hide();
-            $("#contact-view").show("slide", { direction: "left" }, 500);
+            $("#about-view").show("slide", { direction: "left" }, 500);
         });
 
     });
