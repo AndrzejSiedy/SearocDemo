@@ -1,4 +1,4 @@
-﻿var WmsLayerModel = function (id, visible, queryable, name, title, getMapUrl, type, olLayer, isOnMap) {
+﻿var LayerModel = function (id, visible, queryable, name, title, getMapUrl, type, olLayer, isOnMap) {
     var self = this;
 
     self.id = id;
@@ -21,12 +21,12 @@
 
 
 
-var WmsLayerViewModel = function (layers) {
+var LayerViewModel = function (layers) {
     var self = this;
     self.layers = ko.observableArray(layers);
 
     self.registerLayer = function (l) {
-        self.layers.push(new WmsLayerModel(l.id, l.visible, l.queryable, l.Name, l.Title, l.getMapUrl, l.type, l.olLayer, l.isOnMap));
+        self.layers.push(new LayerModel(l.id, l.visible, l.queryable, l.Name, l.Title, l.getMapUrl, l.type, l.olLayer, l.isOnMap));
     };
 
     self.addLayer2Map = function (l) {
@@ -53,5 +53,5 @@ var WmsLayerViewModel = function (layers) {
 };
 
 // init ko ViewModel
-var wmsLayerViewModel = new WmsLayerViewModel([]);
-ko.applyBindings(wmsLayerViewModel);
+var layerViewModel = new LayerViewModel([]);
+ko.applyBindings(layerViewModel);
