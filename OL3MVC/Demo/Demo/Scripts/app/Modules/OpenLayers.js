@@ -271,6 +271,7 @@ Gnx.OpenLayers = function () {
     };
 
     this.getLayerById = function (id) {
+
         for (var i = 0 ; i < self.layers.length; i++) {
             var l = self.layers[i];
             if (l.id == id) {
@@ -320,6 +321,48 @@ Gnx.OpenLayers = function () {
 
     };
 
+    var _wfsRawLayersDataReady = function (evt, data) {
+        console.warn('process blooedy WFS layers', data);
+
+        var loader = function (extent, resolution, projection) {
+            var url = self.proxy + 'http://localhost:8080/geoserver/ows?service=WFS&' +
+                'version=1.1.0&request=GetFeature&typename=tiger:poly_landmarks&' +
+                'outputFormat=JSON' +
+                '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
+            $.ajax({
+                url: url,
+                success: function (response) {
+                    loadFeatures(response);
+                }
+            });
+        };
+
+        var vectorSource = new ol.source.ServerVector({
+            format: new ol.format.GeoJSON(),
+            loader: loader,
+            strategy: ol.loadingstrategy.createTile(new ol.tilegrid.XYZ({
+                maxZoom: 19
+            })),
+            projection: 'EPSG:3857'
+        });
+
+        var loadFeatures = function (response) {
+            vectorSource.addFeatures(vectorSource.readFeatures(response));
+        };
+
+        var vector = new ol.layer.Vector({
+            source: vectorSource,
+            style: new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: 'rgba(0, 0, 255, 1.0)',
+                    width: 2
+                })
+            })
+        });
+
+        self.map.addLayer(vector);
+    };
+
     var _parseWmsCapabilities = function (rawData) {
         var parser = new ol.format.WMSCapabilities();
         var result = parser.read(rawData);
@@ -353,12 +396,6 @@ Gnx.OpenLayers = function () {
 
     };
 
-    var _parseWfsCapabilities = function (rawData) {
-        var parser = new OpenLayers.Format.WFSCapabilities({});
-        var result = parser.read(rawData);
-        console.warn('WFS', result);
-    }
-
     // simple method conatinating user, pass and url
     var _getWmsCapabilities = function (evt, data) {
 
@@ -386,12 +423,10 @@ Gnx.OpenLayers = function () {
 
         // inject user and and pass to the capabilities request
         if (data.userName.length > 0 && data.password.length > 0) {
-
             options.data = {
                 username: data.userName,
                 password: data.password
             };
-
         }
 
         //'http://demo:searoc@gis-demo.seaplanner.com:8080/ows?&service=wms&request=GetCapabilities'
@@ -401,77 +436,78 @@ Gnx.OpenLayers = function () {
 
     };
 
-    // simple method conatinating user, pass and url
-    var _getWfsCapabilities = function (evt, data) {
+    // matcher between GeoServer workspace Name and workspace Uri
+    var _getGeoserverWorkspaces = function (req, wfsCaps) {
 
+        if (!req.responseText || req.responseText.length == 0) return;
 
+        var format = new OpenLayers.Format.XML();
+        var xmlDoc = format.read(req.responseText);
+        var match = [];
 
-        var vectorSource = new ol.source.ServerVector({
-            format: new ol.format.GeoJSON(),
-            loader: function (extent, resolution, projection) {
-                var url = self.proxy + 'http://localhost:8080/geoserver/wfs?service=WFS&' +
-                    'version=1.1.0&request=GetFeature&typename=tiger:poly_landmarks&' +
-                    'outputFormat=JSON' +
-                    //'outputFormat=text/javascript&format_options=callback:loadFeatures' +
-                    '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
-                $.ajax({
-                    url: url,
-                    //dataType: 'jsonp',
-                    success: function (response) {
-                        loadFeatures(response);
-                    }
+        if (xmlDoc && xmlDoc.activeElement && xmlDoc.activeElement.attributes) {
+            var attribs = xmlDoc.activeElement.attributes;
+            for (var i = 0; i < attribs.length; i++) {
+                match.push({
+                    workspaceName: attribs[i].localName,
+                    workspaceUri: attribs[i].nodeValue
                 });
-            },
-            strategy: ol.loadingstrategy.createTile(new ol.tilegrid.XYZ({
-                maxZoom: 19
-            })),
-            projection: 'EPSG:3857'
-        });
+            }
+        }
 
-        // Variant 1 - loaded uses require proxy due to CORS
-        //this.loader = function (extent, resolution, projection) {
-        //    var url = self.proxy + 'http://localhost:8080/geoserver/wfs?service=WFS&' +
-        //        'version=1.1.0&request=GetFeature&typename=tiger:poly_landmarks&' +
-        //        'outputFormat=JSON' +
-        //        '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
-        //    $.ajax({
-        //        url: url,
-        //        //dataType: 'jsonp',
-        //        success: function (response) {
-        //            self.loadFeatures(response);
-        //        }
-        //    });
-        //};
+        // assign feature namespace to featureTypes
+        var fTs = wfsCaps.featureTypeList.featureTypes;
+        for (var i = 0; i < fTs.length; i++) {
+            fTs[i].ns = getNameSpaceByUri(match, fTs[i].featureNS);
+        }
 
-        // Variant 2 - loaded uses JSONP, and requres "format_options=callback" to be global variable
-        this.loader = function (extent, resolution, projection) {
-            var url = self.proxy + 'http://localhost:8080/geoserver/wfs?service=WFS&' +
-                'version=1.1.0&request=GetFeature&typename=tiger:poly_landmarks&' +
-                'outputFormat=text/javascript&format_options=callback:Gnx.ol3.loadFeatures' +
-                '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
-            $.ajax({
-                url: url,
-                dataType: 'jsonp'
-            });
-        };
+        Gnx.Event.fireEvent('wfs-layers-ready-to-load', wfsCaps);
+
+    };
+
+    var getNameSpaceByUri = function (matchArr, uri) {
+
+        for (var i = 0; i < matchArr.length; i++) {
+            if (matchArr[i].workspaceUri == uri) return matchArr[i].workspaceName;
+        }
+        return null;
+    };
+
+    var _parseWfsCapabilities = function (rawData, url, credentials) {
+
+        var parser = new OpenLayers.Format.WFSCapabilities({});
+        var result = parser.read(rawData);
+
+        // after capabilities ready, call Wfs DescribeFeatureType
+
+        // first need to get list of workspace name and assigned Namespace URI
+        // when getting response from WfsCapabilities, we get Namespace URI only
+        // but to build WFS layer we need Namespace NAME
 
         
-        self.loadFeatures = function (response) {
-            vectorSource.addFeatures(vectorSource.readFeatures(response));
-        };
+        var options = {
+            type: "GET",
+            url: self.proxy + url + 'SERVICE=WFS&VERSION=1.1.0&REQUEST=DescribeFeatureType',
+            success: function (response) {
+                _getGeoserverWorkspaces(response, result);
+            },
+            error: function (data) {
+                console.warn('error', data);
+            }
+        }
 
-        var vector = new ol.layer.Vector({
-            source: vectorSource,
-            style: new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                    color: 'rgba(0, 0, 255, 1.0)',
-                    width: 2
-                })
-            })
-        });
+        // inject user and and pass to the capabilities request
+        if (credentials.username && credentials.password && credentials.username.length > 0 && credentials.password.length > 0) {
+            options.data = credentials;
+        }
 
-        self.map.addLayer(vector);
+        $.ajax(options);
+    }
 
+
+
+    // simple method conatinating user, pass and url
+    var _getWfsCapabilities = function (evt, data) {
 
         var url = data.url;
 
@@ -490,11 +526,14 @@ Gnx.OpenLayers = function () {
         var options = {
             type: "GET",
             url: url,
-            success: function (data) {
-                _parseWfsCapabilities(data);
+            success: function (response) {
+                _parseWfsCapabilities(response, data.url, {
+                    username: data.userName,
+                    password: data.password
+                });
             },
-            error: function (data) {
-                console.warn('error', data);
+            error: function (response) {
+                console.warn('error', response);
             }
         }
 
@@ -511,11 +550,9 @@ Gnx.OpenLayers = function () {
         //'http://demo:searoc@gis-demo.seaplanner.com:8080/ows?&service=wms&request=GetCapabilities'
 
         // make capabilities request
-        $.ajax(options)
+        $.ajax(options);
 
     }
-
-
 
     var bindUiEvents = function () {
         // capture west pane resize
@@ -540,6 +577,10 @@ Gnx.OpenLayers = function () {
 
         // user changed layer visibility in data grid
         Gnx.Event.on('set-layer-visibility-change', _onLayerVisibilityChange);
+
+
+        // user internally by OpenLayers module
+        Gnx.Event.on('wfs-layers-ready-to-load', _wfsRawLayersDataReady);
     };
 
     this.init = function () {
