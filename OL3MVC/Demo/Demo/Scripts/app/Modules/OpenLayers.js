@@ -60,6 +60,13 @@ Gnx.OpenLayers = function () {
             zoom: 5
         });
 
+        var view = new ol.View({
+            center: [-8234182.45122, 4980466.18673],
+            center: [-288880.11034, 7038476.9371],
+            maxZoom: 19,
+            zoom: 11
+        });
+
         //base layers
         var osm = new ol.layer.Tile({
             //just mark the layer as the base layer, so it is possible to distinguish between hgis layers and the layers that are meant to act as base layers
@@ -115,6 +122,7 @@ Gnx.OpenLayers = function () {
         });
 
     };
+  
 
     var getWmsFeatureInfo = function (evt) {
 
@@ -123,19 +131,35 @@ Gnx.OpenLayers = function () {
 
         var viewResolution = (self.map.getView().getResolution());
 
-        var gfiIframes = '';
-
         for (var i = 0 ; i < self.layers.length; i++) {
             var l = self.layers[i];
 
             if (l.queryable && l.isOnMap && l.olLayer.getVisible() && l.type == 'WMS') {
                 var url = l.olLayer.getSource().getGetFeatureInfoUrl(
                     evt.coordinate, viewResolution, mapProjCode,
-                    { 'INFO_FORMAT': 'text/html' });
+                    { 'INFO_FORMAT': 'application/json' });
                 if (url) {
-                    gfiIframes = gfiIframes + '<br/><iframe seamless src="' + url + '"></iframe>';
 
-                    self.popup.show(evt.coordinate, '<div>' + gfiIframes + '</div>');
+                    $.ajax({
+                        url: self.proxy + url,
+                        success: function (response) {
+                            console.warn('gti', JSON.parse(response));
+                            var gfi = JSON.parse(response);
+                            if (gfi.features.length > 0) {
+                                // for simplicity we take only first one
+                                var f = gfi.features[0];
+                                var html = '';
+                                for (var p in f.properties) {
+                                    html = html + '<p>' + p + ': ' + f.properties[p] + '</p>';
+                                }
+                                self.popup.show(evt.coordinate, html);
+                            }
+                        }
+                    });
+
+
+                    
+                    
                 }
             }
         }
@@ -288,12 +312,24 @@ Gnx.OpenLayers = function () {
                 '&service=WFS&version=1.1.0&typename=' + data.ns + ':' + data.name +
                 '&outputFormat=JSON' +
                 '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
-            $.ajax({
+
+            var options = {
                 url: url,
                 success: function (response) {
                     loadFeatures(response);
                 }
-            });
+            }
+
+            // inject user and and pass to the capabilities request
+            //if (self.credentials) {
+
+            //    options.data = {
+            //        username: self.credentials.username,
+            //        password: self.credentials.password
+            //    };
+
+            //}
+            $.ajax(options);
         };
 
         var vectorSource = new ol.source.ServerVector({
@@ -434,6 +470,9 @@ Gnx.OpenLayers = function () {
 
         for (var i = 0; i < fts.length; i++) {
             fts[i].href = href;
+            // inject username, password - this is dirty but trying to made it working as this is only demo app
+            //fts[i], username = data.
+
             var l = _registerWfsLayer(fts[i]);
             layerViewModel.registerLayer(l);
         }
@@ -472,6 +511,8 @@ Gnx.OpenLayers = function () {
 
     // simple method conatinating user, pass and url
     var _getWmsCapabilities = function (evt, data) {
+
+        _setCredentials(data);
 
         var url = data.url;
 
@@ -553,7 +594,7 @@ Gnx.OpenLayers = function () {
         return null;
     };
 
-    var _parseWfsCapabilities = function (rawData, url, credentials) {
+    var _parseWfsCapabilities = function (rawData, url) {
 
         var parser = new OpenLayers.Format.WFSCapabilities({});
         var result = parser.read(rawData);
@@ -576,18 +617,31 @@ Gnx.OpenLayers = function () {
         }
 
         // inject user and and pass to the capabilities request
-        if (credentials.username && credentials.password && credentials.username.length > 0 && credentials.password.length > 0) {
-            options.data = credentials;
+        if (self.credentials) {
+
+            options.data = {
+                username: self.credentials.username,
+                password: self.credentials.password
+            };
+
         }
 
         $.ajax(options);
     }
 
-
+    var _setCredentials = function(data){
+        self.credentials = {
+            username: data.userName,
+            password: data.password
+        }
+    };
 
     // simple method conatinating user, pass and url
     var _getWfsCapabilities = function (evt, data) {
 
+        _setCredentials(data);
+
+        console.warn('wfs caps', data);
         var url = data.url;
 
         if (url.indexOf('service') == -1) {
@@ -609,10 +663,7 @@ Gnx.OpenLayers = function () {
                 showGridLoadMask();
             },
             success: function (response) {
-                _parseWfsCapabilities(response, data.url, {
-                    username: data.userName,
-                    password: data.password
-                });
+                _parseWfsCapabilities(response, data.url);
                 hideGridLoadMask();
             },
             error: function (response) {
@@ -624,11 +675,11 @@ Gnx.OpenLayers = function () {
         }
 
         // inject user and and pass to the capabilities request
-        if (data.userName.length > 0 && data.password.length > 0) {
+        if (self.credentials) {
 
             options.data = {
-                username: data.userName,
-                password: data.password
+                username: self.credentials.username,
+                password: self.credentials.password
             };
 
         }
