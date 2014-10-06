@@ -512,7 +512,7 @@ Gnx.OpenLayers = function () {
         //'http://demo:searoc@gis-demo.seaplanner.com:8080/ows?&service=wms&request=GetCapabilities'
 
         // make capabilities request
-        $.ajax(options)
+        $.ajax(options);
 
     };
 

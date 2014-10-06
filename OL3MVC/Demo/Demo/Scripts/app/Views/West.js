@@ -7,8 +7,8 @@ Gnx.West = function () {
     this.initialized = false;
 
     var _init = function () {
-        
-    }
+
+    };
 
     // colect form data
     this.getWmsCapabilitiesCredentials = function () {
@@ -36,14 +36,14 @@ Gnx.West = function () {
 
         // fire event to inform interested modules that user provided Wms capabilities credentials
         Gnx.Event.fireEvent('get-wms-capabilities', {
-            userName:  $('#inpUserName').val(),
+            userName: $('#inpUserName').val(),
             password: $('#inpPass').val(),
             url: $('#inpWmsUrl').val()
-        })
+        });
 
-    }
+    };
 
-    this.getWfsCapabilitiesCredentials = function(){
+    this.getWfsCapabilitiesCredentials = function () {
         if ($('#inpWfsUrl').val().length == 0) {
 
             $("#dialog-info").html("WFS Url - field required");
@@ -70,8 +70,8 @@ Gnx.West = function () {
             userName: $('#inpUserName').val(),
             password: $('#inpPass').val(),
             url: $('#inpWfsUrl').val()
-        })
-    }
+        });
+    };
     
     this.init = function () {
 
@@ -82,5 +82,5 @@ Gnx.West = function () {
         this.initialized = _initialized = true;
 
         return this.initialized;
-    }
+    };
 };

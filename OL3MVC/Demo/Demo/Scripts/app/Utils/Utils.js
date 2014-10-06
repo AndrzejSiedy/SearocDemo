@@ -27,9 +27,9 @@ $.fn.showLoadMask = function () {
                     '</div>';
         this.append(html);
     }
-    
+
     $("#" + lmId).show();
-}
+};
 
 /**
  * Plugin to hide loadmask assigned to given div, a, span elements if shown using "showLoadMask" plugin
@@ -39,4 +39,4 @@ $.fn.hideLoadMask = function () {
     // get assigned loadmask id from DOM object data
     var lmId = this.data("_loadMaskId_");
     $("#" + lmId).hide();
-}
+};

@@ -11,18 +11,18 @@ Gnx.Layout = function () {
 
     var westResizeCallback = function () {
         Gnx.Event.fireEvent('layout-west-resize-start');
-    }
+    };
 
     var westResizeEndCallback = function () {
         Gnx.Event.fireEvent('layout-west-resize-end');
-    }
+    };
 
     var westOpenEnd = function () {
         Gnx.Event.fireEvent('layout-west-open-end');
-    }
+    };
     var westCloseEnd = function () {
         Gnx.Event.fireEvent('layout-west-close-end');
-    }
+    };
 
     var _initLayout = function () {
 
@@ -58,7 +58,7 @@ Gnx.Layout = function () {
         //$('.west-toggler-collapse').css('color', $('#nav-container').css('color'));
         //$('.west-toggler-expand').css('color', $('#nav-container').css('color'));
 
-    }
+    };
 
 
     this.init = function () {
