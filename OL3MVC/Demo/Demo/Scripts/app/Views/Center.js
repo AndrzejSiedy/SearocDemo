@@ -8,7 +8,7 @@ Gnx.Center = function () {
     this.initialized = false;
 
     var _init = function () {
-        var html = 'loaded center stuff on init'
+        var html = 'loaded center stuff on init';
         $('#center-inner').html(html);
     }
     
@@ -22,7 +22,7 @@ Gnx.Center = function () {
         // a bit delayed mask remove
         setTimeout(function () {
             $('#center-inner').hideLoadMask();
-        }, 500)
+        }, 500);
         
     }
 
