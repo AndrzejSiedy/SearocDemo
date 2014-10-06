@@ -63,8 +63,6 @@ namespace Demo.Proxy
 
             Console.WriteLine("Response stream received.");
 
-            //string wtf = readStream.ReadToEnd();
-
             CopyStream(readStream.BaseStream, context.Response.OutputStream);
             context.Response.End();
 
