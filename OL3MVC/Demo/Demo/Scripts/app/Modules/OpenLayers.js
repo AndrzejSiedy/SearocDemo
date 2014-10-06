@@ -55,9 +55,9 @@ Gnx.OpenLayers = function () {
         });
 
         var view = new ol.View({
-            center: [-8234182.45122, 4980466.18673],
+            center: [-288880.11034, 7038476.9371],
             maxZoom: 19,
-            zoom: 11
+            zoom: 5
         });
 
         //base layers
@@ -73,11 +73,11 @@ Gnx.OpenLayers = function () {
         self.map = new ol.Map({
             target: mapDivId,
             layers: [
-               //osm
-              new ol.layer.Tile({
-                  source: new ol.source.MapQuest({ layer: 'sat' }),
-                  title: 'Base-Sat'
-              })
+               osm
+              //new ol.layer.Tile({
+              //    source: new ol.source.MapQuest({ layer: 'sat' }),
+              //    title: 'Base-Sat'
+              //})
               //wmsLayer,
               //wmsLayer1
             ],
@@ -121,7 +121,7 @@ Gnx.OpenLayers = function () {
         var mapProjection = self.map.getView().getProjection();
         var mapProjCode = mapProjection.getCode();
 
-        var viewResolution = /** @type {number} */ (self.map.getView().getResolution());
+        var viewResolution = (self.map.getView().getResolution());
 
         var gfiIframes = '';
 
@@ -442,7 +442,7 @@ Gnx.OpenLayers = function () {
     var _parseWmsCapabilities = function (rawData) {
         var parser = new ol.format.WMSCapabilities();
         var result = parser.read(rawData);
-
+        console.warn('wms capabilities', result);
         var layers = result.Capability.Layer.Layer;
         var getMapUrl = result.Capability.Request.GetMap.DCPType[0].HTTP.Get.OnlineResource.split('?')[0] + '?';
 
