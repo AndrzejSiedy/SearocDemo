@@ -306,9 +306,18 @@ Gnx.OpenLayers = function () {
         });
 
         var loadFeatures = function (response) {
-            vectorSource.addFeatures(vectorSource.readFeatures(response));
-            // after data loaded zoom to layer data extent
-            self.map.getView().fitExtent(vectorSource.getExtent(), self.map.getSize());
+            console.warn('loadFeatures', response);
+            try{
+                var features = vectorSource.readFeatures(response);
+                console.warn('loaded features', features.length);
+                vectorSource.addFeatures(features);
+                // after data loaded zoom to layer data extent
+                self.map.getView().fitExtent(vectorSource.getExtent(), self.map.getSize());
+            }
+            catch (ex) {
+                console.warn('failed to load features data', response);
+                showErrorInfo('failed to load features data', response);
+            }
         };
 
         var image = new ol.style.Circle({
@@ -408,7 +417,7 @@ Gnx.OpenLayers = function () {
         layer.queryable = true;
         layer.visible = false;
         layer.olLayer = vector;
-
+        console.warn('vector layer', layer);
         // add to stored data
         self.layers.push(layer);
 
@@ -451,7 +460,7 @@ Gnx.OpenLayers = function () {
 
             // add unique layer indentifier;
             l.id = $.getUuid();
-
+            console.warn('wms layer', l);
             // register & prepare layer
             _registerWmsLayer(l);
 
@@ -531,7 +540,7 @@ Gnx.OpenLayers = function () {
         for (var i = 0; i < fTs.length; i++) {
             fTs[i].ns = getNameSpaceByUri(match, fTs[i].featureNS);
         }
-
+        console.warn('GeoServer workspaces', fTs);
         // fire event internaly
         Gnx.Event.fireEvent('wfs-layers-ready-to-load', wfsCaps);
     };
