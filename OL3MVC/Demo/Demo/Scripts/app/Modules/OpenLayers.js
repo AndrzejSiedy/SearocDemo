@@ -156,10 +156,6 @@ Gnx.OpenLayers = function () {
                             }
                         }
                     });
-
-
-                    
-                    
                 }
             }
         }
@@ -342,13 +338,13 @@ Gnx.OpenLayers = function () {
         });
 
         var loadFeatures = function (response) {
-            console.warn('loadFeatures', response);
             try{
                 var features = vectorSource.readFeatures(response);
-                console.warn('loaded features', features.length);
+                console.warn('loaded features', features.length, vectorSource.getExtent());
                 vectorSource.addFeatures(features);
-                // after data loaded zoom to layer data extent
-                self.map.getView().fitExtent(vectorSource.getExtent(), self.map.getSize());
+                vectorSource.on('addfeature', function () {
+                    self.map.getView().fitExtent(vectorSource.getExtent(), self.map.getSize());
+                });
             }
             catch (ex) {
                 console.warn('failed to load features data', response);
@@ -356,10 +352,14 @@ Gnx.OpenLayers = function () {
             }
         };
 
+        var fill = new ol.style.Fill({
+            color: 'rgba(255,255,255,0.4)'
+        });
+
         var image = new ol.style.Circle({
-            radius: 5,
-            fill: null,
-            stroke: new ol.style.Stroke({ color: 'red', width: 1 })
+            stroke: new ol.style.Stroke({ color: 'red', width: 3 }),
+            radius: 10,
+            fill: fill
         });
 
         var styles = {
@@ -369,13 +369,13 @@ Gnx.OpenLayers = function () {
             'LineString': [new ol.style.Style({
                 stroke: new ol.style.Stroke({
                     color: 'green',
-                    width: 1
+                    width: 3
                 })
             })],
             'MultiLineString': [new ol.style.Style({
                 stroke: new ol.style.Stroke({
                     color: 'green',
-                    width: 1
+                    width: 3
                 })
             })],
             'MultiPoint': [new ol.style.Style({
@@ -384,7 +384,7 @@ Gnx.OpenLayers = function () {
             'MultiPolygon': [new ol.style.Style({
                 stroke: new ol.style.Stroke({
                     color: 'yellow',
-                    width: 1
+                    width: 3
                 }),
                 fill: new ol.style.Fill({
                     color: 'rgba(255, 255, 0, 0.1)'
@@ -599,6 +599,7 @@ Gnx.OpenLayers = function () {
         var parser = new OpenLayers.Format.WFSCapabilities({});
         var result = parser.read(rawData);
 
+        console.warn('capabilities', result);
         // after capabilities ready, call Wfs DescribeFeatureType
 
         // first need to get list of workspace name and assigned Namespace URI
@@ -627,6 +628,7 @@ Gnx.OpenLayers = function () {
         }
 
         $.ajax(options);
+
     }
 
     var _setCredentials = function(data){
@@ -641,7 +643,6 @@ Gnx.OpenLayers = function () {
 
         _setCredentials(data);
 
-        console.warn('wfs caps', data);
         var url = data.url;
 
         if (url.indexOf('service') == -1) {
