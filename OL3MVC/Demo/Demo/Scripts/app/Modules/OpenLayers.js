@@ -303,6 +303,59 @@ Gnx.OpenLayers = function () {
 
         var urlStr = self.proxy + data.href.get;
 
+        // NOTE this is only for jsonp test
+        //var loader = function (extent, resolution, projection) {
+        //    var url = urlStr +
+        //        '&service=WFS&version=1.1.0&typename=' + data.ns + ':' + data.name +
+        //        '&outputFormat=JSON' +
+        //        '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
+
+
+
+        //    var url = urlStr +
+        //        '&service=WFS&version=1.1.0&typename=' + data.ns + ':' + data.name +
+        //        '&outputFormat=text/javascript&format_options=callback:?' +
+        //        '&srsname=EPSG:3857&bbox=' + extent.join(',') + ',EPSG:3857';
+
+
+        //    var localJsonpCallback = function (resp) {
+        //        console.warn('local jsonp', resp);
+        //    };
+
+        //    var options = {
+        //        url: url,
+        //        dataType: 'jsonp',
+        //        //jsonpCallback: 'getJson',
+        //        context: vectorSource,
+        //        contentType: 'application/json',
+        //        //jsonpCallback: 'localJsonpCallback',
+        //        jsonp: "callback",
+        //        success: function (response) {
+        //            if (response && response.totalFeatures > 0) {
+        //                console.warn('jsonp success', response, this);
+        //                loadFeatures(response);
+        //            }
+        //            //loadFeatures(response);
+        //        },
+        //        error: function (response) {
+        //            if (response.status == 200) {
+        //                console.warn('jsonp error', response, this);
+        //            }
+        //        }
+        //    }
+
+        //    // inject user and and pass to the capabilities request
+        //    //if (self.credentials) {
+
+        //    //    options.data = {
+        //    //        username: self.credentials.username,
+        //    //        password: self.credentials.password
+        //    //    };
+
+        //    //}
+        //    $.ajax(options);
+        //};
+
         var loader = function (extent, resolution, projection) {
             var url = urlStr +
                 '&service=WFS&version=1.1.0&typename=' + data.ns + ':' + data.name +
